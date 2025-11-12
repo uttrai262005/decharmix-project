@@ -4,7 +4,7 @@ const pool = require("../config/db");
 const getProducts = async (req, res) => {
   try {
     // === SỬA 1: Thêm 'tag', 'page', 'limit' (với giá trị mặc định) ===
-    const { category, filter, limit = 10, page = 1, search, tag } = req.query;
+    const { category, filter, limit = 999, page = 1, search, tag } = req.query;
 
     let queryParams = []; // Chứa các giá trị cho SQL
     let query = `
