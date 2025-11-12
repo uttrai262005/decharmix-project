@@ -57,9 +57,7 @@ app.use("/api/games", gameRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/customers", customerRoutes);
 app.use("/api/settings", settingsRoutes);
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "shinsen-frontend", "index.html"));
-});
+
 // 5. Khởi động server
 app.listen(PORT, () => {
   console.log(`✅ Backend server đang chạy trên cổng ${PORT}`);
