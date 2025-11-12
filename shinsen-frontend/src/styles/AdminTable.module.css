@@ -1,0 +1,234 @@
+/* Dùng cho Tabs và Bảng (Table) */
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.tabButton {
+  padding: 0.75rem 1.25rem;
+  border: none;
+  background-color: transparent;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-main, #7c596b);
+  cursor: pointer;
+  position: relative;
+  bottom: -2px; /* Đặt tab đè lên border */
+  border-bottom: 2px solid transparent;
+}
+.tabButton:hover {
+  color: var(--text-title, #be5985);
+}
+.tabButton.active {
+  color: var(--brand-pink, #fe98bf);
+  border-bottom-color: var(--brand-pink, #fe98bf);
+}
+
+/* Bảng */
+.tableWrapper {
+  background-color: var(--white, #ffffff);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  overflow: hidden; /* Quan trọng cho border-radius */
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 1.25rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.table th {
+  background-color: var(--bg-pink, #fff5f9);
+  color: var(--text-title, #be5985);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+.table tbody tr:hover {
+  background-color: #fcfcfc;
+}
+
+.code {
+  font-weight: 700;
+  color: var(--text-title, #be5985);
+}
+.price {
+  font-weight: 600;
+}
+
+/* Nút xem chi tiết (Dùng cho trang Orders) */
+.actionButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: 6px;
+  background-color: var(--text-main, #7c596b);
+  color: var(--white, #ffffff);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+.actionButton:hover {
+  background-color: var(--text-title, #be5985);
+}
+
+/* Các tag trạng thái (Dùng cho trang Orders) */
+.status {
+  padding: 0.3rem 0.75rem;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: capitalize;
+}
+.status.processing,
+.status.pending_recipient {
+  background-color: #fffbeb; /* Vàng nhạt */
+  color: #d97706; /* Vàng đậm */
+}
+.status.shipping {
+  background-color: #eff6ff; /* Xanh dương nhạt */
+  color: #2563eb; /* Xanh dương đậm */
+}
+.status.delivered {
+  background-color: #f0fdf4; /* Xanh lá nhạt */
+  color: #16a34a; /* Xanh lá đậm */
+}
+.status.cancelled {
+  background-color: #fee2e2; /* Đỏ nhạt */
+  color: #dc2626; /* Đỏ đậm */
+}
+
+/* === BẮT ĐẦU: CSS CHO TRANG SẢN PHẨM === */
+/* (Code này đã có ở tin nhắn [118], đảm bảo nó ở đây) */
+
+.createButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: 8px;
+  background-color: var(--brand-pink, #fe98bf);
+  color: var(--white, #ffffff);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.createButton:hover {
+  background-color: var(--brand-pink-darker, #be5985);
+}
+
+.productImage {
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid #f0f0f0;
+}
+
+.name {
+  font-weight: 600;
+  color: #333;
+}
+
+/* Tồn kho */
+.stockOk {
+  font-weight: 700;
+  color: #16a34a; /* Xanh lá */
+}
+.stockLow {
+  font-weight: 700;
+  color: #dc2626; /* Đỏ */
+}
+
+/* Nhóm nút hành động */
+.actionGroup {
+  display: flex;
+  gap: 0.5rem;
+}
+.actionButtonView,
+.actionButtonEdit,
+.actionButtonDelete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  font-size: 1rem;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Nút Xem (Mắt) */
+.actionButtonView {
+  background-color: #f4f4f5; /* Xám nhạt */
+  color: #52525b; /* Xám đậm */
+}
+.actionButtonView:hover {
+  background-color: #e4e4e7;
+}
+
+/* Nút Sửa (Bút) */
+.actionButtonEdit {
+  background-color: #eff6ff; /* Xanh dương nhạt */
+  color: #2563eb; /* Xanh dương đậm */
+}
+.actionButtonEdit:hover {
+  background-color: #dbeafe;
+}
+
+/* Nút Xóa (Thùng rác) */
+.actionButtonDelete {
+  background-color: #fee2e2; /* Đỏ nhạt */
+  color: #dc2626; /* Đỏ đậm */
+}
+.actionButtonDelete:hover {
+  background-color: #fecaca;
+}
+
+/* === KẾT THÚC: CSS CHO TRANG SẢN PHẨM === */
+/* === THÊM VÀO AdminTable.module.css (Cho trang Customers) === */
+
+.toolbar {
+  margin-bottom: 1.5rem;
+}
+
+.searchInput {
+  display: flex;
+  align-items: center;
+  max-width: 400px;
+  background-color: var(--white, #ffffff);
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 0 0.75rem;
+}
+.searchInput svg {
+  color: #999;
+}
+.searchInput input {
+  width: 100%;
+  padding: 0.75rem 0.5rem;
+  font-size: 1rem;
+  border: none;
+  outline: none;
+  background-color: transparent;
+}

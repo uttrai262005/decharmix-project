@@ -1,0 +1,24 @@
+.pageTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-title, #be5985);
+  margin-bottom: 1.5rem;
+}
+/* Thêm vào AdminPage.module.css */
+
+/* Dùng cho Header có Nút (VD: Dashboard, Sửa Sản phẩm, Game) */
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Tiêu đề phụ (VD: "1. Vòng Quay May Mắn") */
+.pageSubtitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #333;
+}

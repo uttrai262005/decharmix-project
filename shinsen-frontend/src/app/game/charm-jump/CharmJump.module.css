@@ -1,0 +1,303 @@
+:root {
+  --bg-cream: #ffffeb;
+  --bg-pink: #fff5f9;
+  --text-title: #be5985;
+  --text-main: #7c596b;
+  --brand-pink: #fe98bf;
+  --border-color: #ffe2f2;
+  --white: #ffffff;
+  --red: #ef4444;
+  --yellow: #f59e0b; /* Màu xu */
+}
+
+/* --- Layout chung --- */
+.pageWrapper {
+  background-color: var(--bg-cream);
+  min-height: 90vh;
+  padding: 2rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.container {
+  width: 100%;
+  max-width: 500px; /* Nhỏ hơn, giống game mobile */
+  margin: 0 auto;
+  text-align: center;
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 10px 30px rgba(255, 226, 242, 0.7);
+  position: relative;
+  overflow: hidden;
+}
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-title);
+  margin-bottom: 0.25rem;
+}
+.subtitle {
+  font-size: 1rem;
+  color: var(--text-main);
+  margin-bottom: 1.5rem;
+}
+.statsBar {
+  display: flex;
+  justify-content: space-around;
+  gap: 1rem;
+  background-color: var(--bg-pink);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+.statItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text-main);
+}
+.statItem svg {
+  color: var(--brand-pink);
+}
+.statItem strong {
+  font-size: 1.1rem;
+  color: var(--text-title);
+}
+
+/* --- Khu vực Game --- */
+.gameArea {
+  width: 100%;
+  height: 300px;
+  background-color: var(--bg-pink);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+/* --- Màn hình chờ (Idle) & Kết quả (Won/Lost) --- */
+.gameIntro,
+.gameResult {
+  width: 100%;
+  height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-pink);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+}
+.gameIntro p,
+.gameResult p {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-title);
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+}
+.playButton {
+  background-color: var(--brand-pink);
+  color: var(--white);
+  padding: 0.8rem 2rem;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.playButton:hover {
+  background-color: var(--text-title);
+}
+.playButton:disabled {
+  background-color: var(--text-light);
+  cursor: not-allowed;
+}
+.loaderIcon {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.resultIcon {
+  font-size: 4rem;
+}
+.resultTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-title);
+}
+.resultMessage {
+  font-size: 1.1rem;
+  color: var(--text-main);
+  margin: 0.5rem 0 1.5rem;
+}
+
+/* --- Các vật thể trong game (Playing) --- */
+.gameHud {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-title);
+  text-shadow: 0 0 5px var(--white);
+  z-index: 10;
+}
+.timerWarning {
+  color: var(--red);
+  animation: pulse 1s infinite;
+}
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.charm {
+  position: absolute;
+  left: 50px;
+  width: 30px;
+  height: 30px;
+  font-size: 30px;
+  color: var(--brand-pink);
+  z-index: 5;
+  transition: transform 0.1s linear;
+}
+
+.obstacleContainer {
+  position: absolute;
+  height: 100%;
+  width: 50px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Tạo khoảng trống ở giữa */
+}
+.obstacleTop,
+.obstacleBottom {
+  background-color: var(--text-main);
+  width: 100%;
+  border-radius: 8px;
+  border: 3px solid #555;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.coin {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+  color: var(--yellow);
+  z-index: 3;
+  animation: pulseCoin 1.5s infinite;
+}
+@keyframes pulseCoin {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+/* === BẮT ĐẦU: CSS MỚI CHO COUNTDOWN === */
+/* (Dán vào cuối file CharmJump.module.css) */
+
+/* Lớp phủ chung cho Idle, Won, Lost, Countdown */
+.overlayScreen {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(
+    255,
+    245,
+    249,
+    0.8
+  ); /* Nền hồng siêu nhạt, hơi trong */
+  z-index: 20;
+  animation: fadeIn 0.3s ease;
+}
+
+/* CSS cho số đếm ngược 3... 2... 1... */
+.countdown {
+  font-size: 8rem;
+  font-weight: 800;
+  color: var(--brand-pink);
+  text-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  animation: pulseCountdown 1s infinite;
+}
+
+@keyframes pulseCountdown {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Sửa lại CSS cũ (bạn có thể thay thế) */
+.gameIntro,
+.gameResult {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 245, 249, 0.8);
+  z-index: 20;
+  animation: fadeIn 0.3s ease;
+  padding: 1rem;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+/* === KẾT THÚC: CSS MỚI === */

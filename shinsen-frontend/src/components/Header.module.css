@@ -1,0 +1,489 @@
+/* === Biến Màu (Chủ đề Hồng Nhạt) === */
+:root {
+  --primary-color: #fe98bf; /* Hồng nhạt (cho nút, link, viền search) */
+  --secondary-color: #f6bcf1; /* Hồng tím nhạt (cho hover) */
+  --light-pink: #ffe2f2; /* Hồng kem (cho viền, nền nhẹ) */
+  --bg-pink: #fff5f9; /* Nền hồng siêu nhạt (gần trắng) */
+  --bg-cream: #ffffeb; /* Nền vàng kem nhạt */
+  --text-dark: #333333;
+  --text-medium: #555555;
+  --text-light: #777777;
+  --border-color: #ffe2f2; /* Viền hồng kem */
+  --white: #ffffff;
+  --gray-100: #f3f4f6;
+  --gray-500: #6b7280;
+  --red-alert: #ef4444; /* Màu đỏ cho badge giỏ hàng */
+}
+
+/* === TOÀN BỘ CSS CHO HEADER HOÀN CHỈNH === */
+.headerWrapper {
+  background-color: var(--white);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  width: 100%;
+}
+
+/* --- THANH THÔNG TIN PHỤ --- */
+.topBar {
+  background-color: var(--bg-pink); /* Nền hồng siêu nhạt */
+  color: var(--primary-color); /* Chữ hồng */
+  font-size: 0.8rem;
+  padding: 0.5rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+.topBarContent {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.topBarLinks {
+  display: flex;
+  gap: 1.5rem;
+}
+.topBarLinks a {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: color 0.2s;
+  color: var(--primary-color);
+}
+.topBarLinks a:hover {
+  color: var(--secondary-color); /* Hover ra hồng tím */
+}
+
+/* --- THANH CHÍNH --- */
+.mainHeader {
+  padding: 1.25rem 1.5rem;
+}
+.mainHeaderContent {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 2rem;
+}
+.logo {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: var(--primary-color); /* Logo màu hồng */
+  letter-spacing: -1px;
+  text-decoration: none;
+}
+
+/* --- THANH TÌM KIẾM --- */
+.searchContainer {
+  position: relative;
+  flex-grow: 1;
+}
+.searchBar {
+  display: flex;
+  align-items: center;
+  border: 2px solid var(--primary-color); /* Viền search màu hồng */
+  border-radius: 50px;
+  overflow: hidden;
+  background-color: var(--white);
+}
+.searchBar input {
+  border: none;
+  outline: none;
+  padding: 0.75rem 1.25rem;
+  font-size: 1rem;
+  width: 100%;
+}
+.searchBar button {
+  background-color: var(--primary-color); /* Nút search màu hồng */
+  color: var(--white);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  font-size: 1.25rem;
+  transition: background-color 0.2s;
+}
+.searchBar button:hover {
+  background-color: var(--secondary-color); /* Hover ra hồng tím */
+}
+.searchResults {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  max-height: 400px;
+  overflow-y: auto;
+}
+.searchLoader,
+.noResults {
+  padding: 1rem;
+  text-align: center;
+  color: var(--text-light);
+}
+.searchResultItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  text-decoration: none;
+}
+.searchResultItem:hover {
+  background-color: var(--bg-pink); /* Hover nền hồng siêu nhạt */
+}
+.searchResultImage {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.searchResultInfo {
+  font-weight: 500;
+  color: var(--text-dark);
+}
+.highlight {
+  font-weight: 700;
+  color: var(--primary-color); /* Highlight màu hồng */
+  background-color: transparent;
+}
+
+/* --- CÁC NÚT ACTIONS --- */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+.authLink,
+.cartButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-medium);
+  font-weight: 500;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.authLink:hover,
+.cartButton:hover {
+  color: var(--primary-color); /* Hover ra màu hồng */
+}
+
+/* --- MENU TÀI KHOẢN --- */
+.userMenu {
+  position: relative;
+  color: var(--text-medium);
+}
+.userMenuButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  color: inherit;
+  transition: color 0.2s;
+}
+.userMenuButton:hover {
+  color: var(--primary-color);
+}
+.userDropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 1rem;
+  width: 220px;
+  background-color: var(--white);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  padding: 0.75rem;
+  flex-direction: column;
+  border: 1px solid var(--border-color);
+  z-index: 101;
+}
+.userDropdown.userDropdownOpen {
+  display: flex;
+}
+.userDropdown span {
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 0.5rem;
+  color: var(--text-dark);
+}
+.userDropdown a,
+.userDropdown button {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  text-align: left;
+  background: none;
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  color: var(--text-medium);
+  font-size: 0.9rem;
+  transition: background-color 0.2s, color 0.2s;
+}
+.userDropdown a:hover,
+.userDropdown button:hover {
+  background-color: var(--bg-pink); /* Hover nền hồng siêu nhạt */
+  color: var(--primary-color);
+}
+
+/* --- GIỎ HÀNG & MINI CART (ĐÃ NÂNG CẤP) --- */
+.cartIconWrapper {
+  position: relative;
+}
+.cartBadge {
+  position: absolute;
+  top: -8px;
+  left: 10px;
+  background-color: var(--red-alert);
+  color: var(--white);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: bold;
+  border: 2px solid var(--white);
+}
+.miniCart {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 1rem;
+  width: 360px;
+  background-color: var(--white);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+}
+.miniCartHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--text-dark);
+}
+.miniCartItems {
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 0.5rem;
+}
+.miniCartItems::-webkit-scrollbar {
+  width: 6px;
+}
+.miniCartItems::-webkit-scrollbar-track {
+  background: transparent;
+}
+.miniCartItems::-webkit-scrollbar-thumb {
+  background: var(--light-pink); /* Scrollbar màu hồng kem */
+  border-radius: 10px;
+}
+.miniCartItems::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary-color);
+}
+.miniCartItem {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 1rem;
+  padding: 0.75rem;
+  align-items: center;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+.miniCartItem:hover {
+  background-color: var(--bg-pink);
+}
+.itemImage {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid var(--border-color);
+}
+.itemDetails {
+  flex-grow: 1;
+}
+.itemName {
+  font-weight: 600;
+  color: var(--text-dark);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+  margin-bottom: 0.25rem;
+}
+.itemPrice {
+  font-size: 0.9rem;
+  color: var(--text-light);
+}
+.miniCartFooter {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--border-color);
+  background-color: var(--bg-pink); /* Nền hồng siêu nhạt */
+  border-radius: 0 0 12px 12px;
+}
+.subtotal {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  color: var(--text-dark);
+}
+.viewCartButton {
+  display: block;
+  text-align: center;
+  padding: 0.8rem;
+  background-color: var(--primary-color);
+  color: var(--white);
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+}
+.viewCartButton:hover {
+  background-color: var(--secondary-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.emptyMessage {
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--text-light);
+}
+
+/* --- THANH ĐIỀU HƯỚNG --- */
+.navBar {
+  background-color: var(--white);
+  border-top: 1px solid var(--border-color);
+}
+.navLinks {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 3rem;
+  height: 50px;
+}
+.navLinks a {
+  font-weight: 600;
+  color: var(--text-medium);
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  position: relative;
+  padding: 0.5rem 0;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+.navLinks a:hover {
+  color: var(--primary-color);
+}
+.navLinks a::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 3px;
+  background-color: var(--primary-color); /* Gạch chân màu hồng */
+  transition: width 0.3s ease;
+}
+.navLinks a:hover::after {
+  width: 100%;
+}
+/* === BẮT ĐẦU: CSS MỚI CHO NÚT SĂN XU === */
+/* (Dán vào cuối file Header.module.css) */
+
+.gameLink {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--bg-pink); /* Nền hồng siêu nhạt */
+  color: var(--primary-color); /* Chữ hồng */
+  padding: 0.6rem 1rem;
+  border-radius: 50px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.gameLink:hover {
+  background-color: var(--light-pink); /* Nền hồng kem khi hover */
+  color: var(--text-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(255, 226, 242, 0.7);
+}
+
+.gameLink svg {
+  transition: transform 0.3s ease;
+}
+
+.gameLink:hover svg {
+  transform: rotate(-15deg) scale(1.1);
+}
+
+/* === KẾT THÚC: CSS MỚI === */
+/* ============================================
+  CSS MỚI CHO NÚT "GIFT BOX BUILDER" CTA
+  (Dán vào cuối file Header.module.css)
+============================================ */
+
+.giftBoxCta {
+  /* Biến thành nút (button) */
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--white); /* Chữ trắng */
+  padding: 0.7rem 1.25rem;
+  border-radius: 50px;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  transition: all 0.2s ease;
+  position: relative; /* Cần để ghi đè gạch chân */
+}
+
+/* Tắt hiệu ứng gạch chân (::after) từ .navLinks a */
+.giftBoxCta::after {
+  display: none;
+}
+
+.giftBoxCta:hover {
+  color: var(--white);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 4px 12px rgba(254, 152, 191, 0.5); /* Đổ bóng hồng */
+}
+
+.giftBoxCta svg {
+  transition: transform 0.3s ease;
+}
+
+.giftBoxCta:hover svg {
+  transform: rotate(-10deg) scale(1.1);
+}

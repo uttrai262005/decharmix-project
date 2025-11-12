@@ -1,0 +1,210 @@
+/* === Biến Màu (Chủ đề Decharmix) === */
+:root {
+  --bg-cream: #ffffeb;
+  --bg-pink: #fff5f9;
+  --text-title: #be5985;
+  --text-main: #7c596b;
+  --brand-pink: #fe98bf;
+  --border-color: #ffe2f2;
+  --white: #ffffff;
+}
+
+.pageWrapper {
+  background-color: var(--bg-cream);
+  min-height: 90vh;
+  padding: 4rem 1rem;
+}
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 2.5rem;
+  box-shadow: 0 10px 30px rgba(255, 226, 242, 0.7);
+  position: relative;
+  overflow: hidden;
+}
+.title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--text-title);
+  margin-bottom: 0.5rem;
+}
+.subtitle {
+  font-size: 1.1rem;
+  color: var(--text-main);
+  margin-bottom: 2rem;
+}
+
+/* Thanh thông tin Xu & Chìa khóa */
+.statsBar {
+  display: flex;
+  justify-content: space-around;
+  gap: 1rem;
+  background-color: var(--bg-pink);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 2.5rem;
+}
+.statItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  color: var(--text-main);
+}
+.statItem svg {
+  color: var(--brand-pink);
+  font-size: 1.25rem;
+}
+.statItem strong {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-title);
+}
+
+/* Lưới Hộp Quà */
+.boxGrid {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  min-height: 180px; /* Giữ chiều cao */
+  position: relative;
+  z-index: 5;
+}
+.boxContainer {
+  perspective: 1000px;
+}
+.giftBox {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.giftBox:hover {
+  transform: scale(1.1);
+}
+/* Trạng thái khi đã mở (ẩn đi 2 hộp kia) */
+.boxHidden {
+  opacity: 0;
+  transform: scale(0.5);
+}
+/* Trạng thái bị vô hiệu hóa (khi đang mở, hoặc đã mở) */
+.boxDisabled {
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.boxDisabled:hover {
+  transform: scale(1);
+}
+
+/* Hiệu ứng Rung (Shaking) */
+.shaking {
+  animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+@keyframes shake {
+  10%,
+  90% {
+    transform: translate3d(-1px, 0, 0) scale(1.1);
+  }
+  20%,
+  80% {
+    transform: translate3d(2px, 0, 0) scale(1.1);
+  }
+  30%,
+  50%,
+  70% {
+    transform: translate3d(-4px, 0, 0) scale(1.1);
+  }
+  40%,
+  60% {
+    transform: translate3d(4px, 0, 0) scale(1.1);
+  }
+}
+
+/* Lớp phủ Loading (Khi đang gọi API) */
+.loadingOverlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-title);
+}
+.loaderIcon {
+  font-size: 3rem;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Pop-up Kết quả */
+.resultPopup {
+  position: absolute;
+  inset: 0;
+  background-color: var(--white);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 15;
+  padding: 2rem;
+  animation: fadeIn 0.5s ease;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.prizeIcon {
+  font-size: 5rem;
+  color: var(--brand-pink);
+}
+.resultTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-title);
+  margin-top: 1rem;
+}
+.resultMessage {
+  font-size: 1.1rem;
+  color: var(--text-main);
+  margin-top: 0.5rem;
+  margin-bottom: 2rem;
+}
+.playAgainButton {
+  background-color: var(--brand-pink);
+  color: var(--white);
+  padding: 0.8rem 2rem;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+.playAgainButton:hover {
+  background-color: var(--text-title);
+}
+.playAgainButton:disabled {
+  background-color: var(--text-light);
+  cursor: not-allowed;
+}

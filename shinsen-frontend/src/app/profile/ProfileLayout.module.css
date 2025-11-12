@@ -1,0 +1,164 @@
+/* Dùng cho /profile/layout.tsx */
+.pageWrapper {
+  background-color: var(--bg-cream, #ffffeb);
+  min-height: calc(100vh - 80px); /* 80px là chiều cao header (ước tính) */
+  padding: 2rem 1rem;
+}
+@media (min-width: 768px) {
+  .pageWrapper {
+    padding: 3rem;
+  }
+}
+
+.profileContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+@media (min-width: 1024px) {
+  .profileContainer {
+    grid-template-columns: 300px 1fr; /* Sidebar 300px, content 1fr */
+  }
+}
+
+/* === Loading === */
+.loadingWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 70vh;
+  background-color: var(--bg-cream, #ffffeb);
+  color: var(--text-title, #be5985);
+}
+.loader {
+  font-size: 2.5rem;
+  animation: spin 1.5s linear infinite;
+}
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* === Sidebar (Cột Trái) === */
+.sidebar {
+  background-color: var(--white, #ffffff);
+  border-radius: 12px;
+  border: 1px solid var(--border-color, #ffe2f2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  height: fit-content; /* Chỉ cao bằng nội dung */
+}
+
+.sidebarHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color, #ffe2f2);
+}
+
+.avatarWrapper {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 2px solid var(--brand-pink, #fe98bf);
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.userName {
+  font-weight: 700;
+  color: var(--text-title, #be5985);
+  font-size: 1.1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.userEmail {
+  font-size: 0.9rem;
+  color: var(--text-light, #a18c96);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Navigation */
+.sidebarNav {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+}
+.navItem {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  color: var(--text-main, #7c596b);
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+.navItem:hover {
+  background-color: var(--bg-pink, #fff5f9);
+  color: var(--text-title, #be5985);
+}
+.navItem.navActive {
+  background-color: var(--bg-pink, #fff5f9);
+  color: var(--brand-pink, #fe98bf);
+}
+.navIcon {
+  margin-right: 0.75rem;
+  font-size: 1.25rem;
+}
+.navLabel {
+  flex-grow: 1;
+}
+.navArrow {
+  font-size: 1rem;
+  color: var(--text-light, #a18c96);
+}
+.navItem.navActive .navArrow {
+  color: var(--brand-pink, #fe98bf);
+}
+
+.navLogout {
+  margin-top: 1rem;
+  border-top: 1px solid var(--border-color, #ffe2f2);
+  padding-top: 1.25rem;
+  color: #dc2626; /* Đỏ */
+}
+.navLogout:hover {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+/* === Main Content (Cột Phải) === */
+.mainContent {
+  background-color: var(--white, #ffffff);
+  border-radius: 12px;
+  border: 1px solid var(--border-color, #ffe2f2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  padding: 1.5rem;
+}
+@media (min-width: 768px) {
+  .mainContent {
+    padding: 2.5rem;
+  }
+}

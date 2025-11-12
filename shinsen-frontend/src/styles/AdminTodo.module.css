@@ -1,0 +1,73 @@
+/* Dùng cho "Việc cần làm" */
+.todoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.todoList {
+  background-color: var(--white, #ffffff);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-title, #be5985);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.todoItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+.todoItem:hover {
+  background-color: var(--bg-pink, #fff5f9);
+}
+
+.itemMain {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.code {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-main, #7c596b);
+  background-color: #f0f0f0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  align-self: flex-start;
+}
+
+.name {
+  font-weight: 600;
+  color: #333;
+}
+
+.price {
+  font-weight: 700;
+  color: var(--text-title, #be5985);
+  font-size: 0.95rem;
+}
+
+.stock {
+  font-weight: 700;
+  color: #f97316; /* Màu cam */
+  font-size: 0.9rem;
+  background-color: #fff7ed;
+  padding: 4px 8px;
+  border-radius: 6px;
+}

@@ -1,0 +1,411 @@
+/* === ProductDetailPage.module.css (Phối màu Hồng Nhạt làm chủ đạo) === */
+/* * Bảng màu sử dụng:
+ *
+ * Hồng sáng (Chủ đạo): #fe98bf
+ * Hồng nhạt (Nền/Viền): #f6bcf1
+ * Hồng phấn (Nền/Viền): #ffe2f2
+ * Vàng kem (Nền phụ): #ffffd8
+ *
+ * Đậm (Phụ/Accent): #be5985
+*/
+
+.container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+  font-family: inherit;
+}
+
+.productGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+@media (min-width: 768px) {
+  .productGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3rem;
+  }
+}
+
+/* --- Cột hình ảnh --- */
+.imageColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.mainImageWrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 100%; /* Giữ tỷ lệ 1:1 */
+  border: 1px solid #ffe2f2; /* Viền hồng phấn */
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.thumbnailGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.75rem;
+}
+
+.thumbnailWrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 100%;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.thumbnailWrapper:hover {
+  border-color: #f6bcf1; /* Viền hồng nhạt */
+}
+
+.thumbnailActive {
+  border-color: #fe98bf; /* Màu hồng sáng chủ đạo */
+  box-shadow: 0 0 0 2px #fe98bf; /* Màu hồng sáng chủ đạo */
+}
+
+/* --- Cột thông tin --- */
+.infoColumn {
+  display: flex;
+  flex-direction: column;
+}
+
+.category {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #be5985; /* Hồng đậm (làm màu phụ) */
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.productName {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #1f2937;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+
+.priceSection {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.salePrice {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #fe98bf; /* Màu hồng sáng chủ đạo */
+}
+
+.originalPrice {
+  font-size: 1.25rem;
+  color: #9ca3af;
+  text-decoration: line-through;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.statusAvailable {
+  color: #be5985; /* Hồng đậm (làm màu phụ) */
+}
+.statusUnavailable {
+  color: #fe98bf; /* Hồng sáng (thay cho màu đỏ) */
+}
+
+.descriptionSection {
+  color: #4b5563;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.actionSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: auto; /* Đẩy xuống cuối */
+  padding-top: 1.5rem;
+  border-top: 1px solid #ffe2f2; /* Viền hồng phấn */
+}
+
+.quantitySelector {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  align-self: flex-start;
+}
+
+.quantityButton {
+  background-color: #ffe2f2; /* Nền hồng phấn */
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: #4b5563;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.quantityButton:hover {
+  background-color: #f6bcf1; /* Nền hồng nhạt */
+}
+
+.quantitySelector span {
+  font-size: 1.25rem;
+  font-weight: 700;
+  min-width: 30px;
+  text-align: center;
+}
+
+.addToCartButton {
+  width: 100%;
+  background-color: #fe98bf; /* Màu hồng sáng chủ đạo */
+  color: white;
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 1rem 0;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.addToCartButton:hover {
+  background-color: #be5985; /* Dùng hồng đậm làm màu hover */
+}
+
+.addToCartButton:active {
+  transform: scale(0.98);
+}
+
+.addToCartButton:disabled {
+  background-color: #ffe2f2;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.extraInfoGrid {
+  background-color: #ffffd8; /* Nền vàng kem */
+  border-radius: 0.75rem;
+  padding: 2rem;
+  border: 1px solid #ffe2f2; /* Viền hồng phấn */
+}
+
+.extraInfoGrid h2 {
+  margin-bottom: 1.5rem;
+}
+
+.extraInfoGrid p {
+  color: #4b5563;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+.navArrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: background-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.navArrow:hover {
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.prevArrow {
+  left: 1rem;
+}
+
+.nextArrow {
+  right: 1rem;
+}
+
+.discountBadge {
+  background-color: #be5985; /* Hồng đậm (làm màu phụ) */
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.25rem 0.6rem;
+  border-radius: 9999px;
+}
+
+.sectionTitle {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #111827;
+  border-bottom: 2px solid #f6bcf1; /* Viền hồng nhạt */
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+.reviewFormContainer {
+  background-color: #ffe2f2; /* Nền hồng phấn */
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid #f6bcf1; /* Viền hồng nhạt */
+}
+
+.reviewFormTitle {
+  font-size: 1.125rem; /* 18px */
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.reviewFormLabel {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  display: block;
+  color: #374151;
+}
+
+.reviewFormTextarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #f6bcf1; /* Viền hồng nhạt */
+  border-radius: 0.375rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.reviewFormTextarea:focus {
+  border-color: #fe98bf; /* Viền hồng sáng chủ đạo */
+  box-shadow: 0 0 0 3px rgba(254, 152, 191, 0.5); /* Đổ bóng hồng sáng */
+}
+
+.reviewSubmitButton {
+  padding: 0.75rem 1.5rem;
+  background-color: #fe98bf; /* Màu hồng sáng chủ đạo */
+  color: white;
+  font-weight: 700;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.reviewSubmitButton:hover {
+  background-color: #be5985; /* Dùng hồng đậm làm màu hover */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+
+.starContainer {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.starLabel {
+  cursor: pointer;
+  padding-right: 0.25rem;
+}
+.reviewsListContainer {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.reviewCard {
+  background-color: #ffffff;
+  border: 1px solid #ffe2f2; /* Viền hồng phấn */
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.reviewCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+}
+
+.reviewHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.reviewAuthor {
+  margin-left: 1rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.reviewComment {
+  color: #4b5563;
+  line-height: 1.6;
+}
+
+.reviewDate {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  margin-top: 0.75rem;
+  text-align: right;
+}
+
+/* === THÊM CÁC STYLE NÀY VÀO CUỐI FILE === */
+
+.promotionBox {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background-color: #ffe2f2; /* Nền hồng phấn */
+  color: #be5985; /* Chữ hồng đậm (màu phụ) */
+  border: 1px solid #f6bcf1; /* Viền hồng nhạt */
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-top: 1.5rem;
+}
+
+.promotionIcon {
+  flex-shrink: 0;
+  font-size: 1.25rem;
+  margin-top: 2px;
+}
+
+.dbText {
+  white-space: pre-line;
+  line-height: 1.7;
+  color: #374151;
+}
+
+.subSectionTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #111827;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.subSectionTitle:first-child {
+  margin-top: 0;
+}

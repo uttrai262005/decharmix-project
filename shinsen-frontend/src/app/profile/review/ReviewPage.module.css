@@ -1,0 +1,100 @@
+/* === Biến Màu (Chủ đề Vàng Kem & Hồng Nhạt) === */
+:root {
+  --primary-accent: #fe98bf; /* Hồng nhạt (cho nút, hover) */
+  --secondary-accent: #f6bcf1; /* Hồng tím nhạt */
+  --light-pink: #ffe2f2; /* Hồng kem (cho viền, nền nhẹ) */
+  --bg-pink: #fff5f9; /* Nền hồng siêu nhạt */
+  --text-title: #be5985; /* Hồng đậm (cho tiêu đề, logo) */
+  --text-main: #7c596b; /* Hồng xám/nâu (cho text thường) */
+  --text-light: #a18c96; /* Hồng xám nhạt (cho sub-text) */
+  --border-color: #ffe2f2; /* Viền hồng kem */
+  --white: #ffffff;
+}
+
+.reviewWrapper {
+  width: 100%;
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(255, 226, 242, 0.4);
+  overflow: hidden;
+  padding: 2rem;
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--text-title);
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: var(--text-main);
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1.5rem;
+}
+
+.message {
+  text-align: center;
+  color: var(--text-light);
+  padding: 3rem 0;
+  font-size: 1.1rem;
+}
+
+.itemsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.itemCard {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background-color: var(--bg-pink);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}
+
+.itemImage {
+  flex-shrink: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: var(--white);
+}
+
+.itemInfo {
+  flex-grow: 1;
+}
+
+.itemName {
+  font-weight: 600;
+  color: var(--text-main);
+  font-size: 1.1rem;
+}
+
+.itemNote {
+  font-size: 0.9rem;
+  color: var(--text-light);
+}
+
+.reviewButton {
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  background-color: var(--primary-accent);
+  border: 1px solid var(--primary-accent);
+  color: var(--white);
+  flex-shrink: 0; /* Không co nút */
+}
+
+.reviewButton:hover {
+  background-color: var(--secondary-accent);
+}

@@ -1,0 +1,275 @@
+/* === Biến Màu (Chủ đề Vàng Kem & Hồng Nhạt) === */
+:root {
+  --primary-accent: #fe98bf; /* Hồng nhạt (cho nút, hover) */
+  --secondary-accent: #f6bcf1; /* Hồng tím nhạt */
+  --light-pink: #ffe2f2; /* Hồng kem (cho viền, nền nhẹ) */
+  --bg-pink: #fff5f9; /* Nền hồng siêu nhạt */
+  --bg-cream: #ffffeb; /* Nền vàng kem nhạt */
+  --text-title: #be5985; /* Hồng đậm (cho tiêu đề, logo) */
+  --text-main: #7c596b; /* Hồng xám/nâu (cho text thường) */
+  --text-light: #a18c96; /* Hồng xám nhạt (cho sub-text) */
+  --border-color: #ffe2f2; /* Viền hồng kem */
+  --white: #ffffff;
+  --status-pending: #f59e0b; /* Màu vàng */
+  --status-shipping: #3b82f6; /* Màu xanh dương */
+  --status-completed: #22c55e; /* Màu xanh lá */
+  --status-cancelled: #ef4444; /* Màu đỏ */
+}
+
+.orderHistoryWrapper {
+  width: 100%;
+  background-color: var(--white); /* Nền trắng */
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(255, 226, 242, 0.4);
+  overflow: hidden; /* Giúp bo góc cho nav */
+}
+
+/* --- Thanh Tabs --- */
+.tabNav {
+  display: flex;
+  overflow-x: auto;
+  background-color: var(--bg-pink);
+  border-bottom: 2px solid var(--border-color);
+}
+
+/* Ẩn thanh cuộn cho tab */
+.tabNav::-webkit-scrollbar {
+  display: none;
+}
+
+.tabButton {
+  padding: 1rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-main);
+  background: none;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  position: relative;
+  transition: color 0.3s ease;
+  flex-shrink: 0; /* Không co lại trên mobile */
+}
+
+.tabButton:hover {
+  color: var(--primary-accent);
+}
+
+.tabButton.tabActive {
+  color: var(--text-title); /* Màu hồng đậm */
+}
+
+.tabButton.tabActive::after {
+  content: "";
+  position: absolute;
+  bottom: -2px; /* Nằm đè lên border-bottom */
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: var(--text-title);
+  border-radius: 3px;
+}
+
+/* --- Danh sách đơn hàng --- */
+.orderList {
+  padding: 1.5rem;
+}
+
+.loadingMessage,
+.emptyMessage {
+  text-align: center;
+  color: var(--text-light);
+  padding: 3rem 0;
+  font-size: 1.1rem;
+}
+
+/* --- Thẻ Đơn hàng --- */
+.orderCard {
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  transition: box-shadow 0.3s ease;
+  overflow: hidden; /* Đảm bảo bo góc cho footer */
+}
+
+.orderCard:hover {
+  box-shadow: 0 4px 12px rgba(255, 226, 242, 0.6);
+}
+
+.orderHeader {
+  display: flex;
+  flex-wrap: wrap; /* Cho phép xuống dòng trên mobile */
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px dashed var(--border-color);
+  font-size: 0.9rem;
+  color: var(--text-main);
+  gap: 0.5rem; /* Khoảng cách nếu xuống dòng */
+}
+
+/* === START: CSS MỚI ĐÃ BỔ SUNG === */
+
+/* .orderBody chứa danh sách sản phẩm */
+.orderBody {
+  padding: 0; /* Xóa padding cũ */
+  line-height: 1.5;
+  color: var(--text-main);
+}
+
+/* Kiểu cho mỗi sản phẩm trong đơn hàng */
+.orderItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem; /* Padding cho mỗi item */
+  border-bottom: 1px solid var(--border-color);
+}
+
+.orderItem:last-child {
+  border-bottom: none;
+}
+
+.itemImage {
+  flex-shrink: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+  /* Đảm bảo Image component hiển thị đúng */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.itemInfo {
+  flex-grow: 1;
+  min-width: 0; /* Fix lỗi flexbox co giãn */
+}
+
+.itemName {
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 0.25rem;
+  /* Giới hạn 2 dòng */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.4;
+}
+
+.itemQuantity {
+  font-size: 0.9rem;
+  color: var(--text-light);
+}
+
+.itemPrice {
+  font-weight: 600;
+  color: var(--text-title);
+  text-align: right;
+  white-space: nowrap; /* Không xuống dòng giá */
+}
+
+/* Phần tóm tắt (Ngày đặt & Tổng tiền) */
+.orderSummary {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; /* Căn phải */
+  gap: 0.5rem;
+  padding: 1.5rem;
+  border-top: 1px solid var(--border-color);
+  background-color: var(--white);
+  font-size: 0.95rem;
+  color: var(--text-main);
+}
+
+.orderSummary p {
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.orderSummary strong {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-title);
+  margin-left: 1rem; /* Khoảng cách giữa chữ 'Thành tiền' và số tiền */
+}
+
+/* === END: CSS MỚI ĐÃ BỔ SUNG === */
+
+.orderFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border-color);
+  background-color: var(--bg-pink);
+}
+
+/* --- Các nút --- */
+.detailButton,
+.reviewButton {
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.detailButton {
+  background-color: var(--white);
+  border: 1px solid var(--primary-accent);
+  color: var(--primary-accent);
+}
+
+.detailButton:hover {
+  background-color: var(--light-pink);
+}
+
+.reviewButton {
+  background-color: var(--primary-accent);
+  border: 1px solid var(--primary-accent);
+  color: var(--white);
+}
+
+.reviewButton:hover {
+  background-color: var(--secondary-accent);
+}
+
+/* --- Các trạng thái --- */
+.statusPending,
+.statusProcessing,
+.statusShipping,
+.statusCompleted,
+.statusCancelled,
+.statusDefault {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+
+.statusPending {
+  color: var(--status-pending);
+}
+.statusProcessing {
+  color: var(--status-pending);
+}
+.statusShipping {
+  color: var(--status-shipping);
+}
+.statusCompleted {
+  color: var(--status-completed);
+}
+.statusCancelled {
+  color: var(--status-cancelled);
+}
+.statusDefault {
+  color: var(--text-light);
+}

@@ -1,0 +1,158 @@
+/* Biến màu (Lấy từ theme Decharmix) */
+:root {
+  --bg-cream: #ffffeb;
+  --bg-pink: #fff5f9;
+  --text-title: #be5985;
+  --text-main: #7c596b;
+  --text-light: #a18c96;
+  --brand-pink: #fe98bf;
+  --brand-pink-darker: #be5985;
+  --border-color: #ffe2f2;
+  --white: #ffffff;
+}
+
+/* Nền trang */
+.pageWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: var(--bg-cream);
+  padding: 2rem 1rem;
+}
+
+/* Hộp form */
+.loginBox {
+  width: 100%;
+  max-width: 400px;
+  padding: 2.5rem;
+  background-color: var(--white);
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 10px 30px rgba(255, 226, 242, 0.7);
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-title);
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.inputGroup label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 0.5rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-pink);
+  color: var(--text-main);
+  transition: all 0.3s ease;
+}
+
+.input:focus {
+  background-color: var(--white);
+  border-color: var(--brand-pink);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--light-pink);
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--white);
+  background-color: var(--brand-pink);
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 0.5rem;
+}
+
+.button:hover:not(:disabled) {
+  background-color: var(--brand-pink-darker);
+  transform: scale(1.02);
+}
+
+.button:disabled {
+  background-color: var(--text-light);
+  cursor: not-allowed;
+}
+
+/* Link Đăng ký / Đăng nhập */
+.footerText {
+  text-align: center;
+  margin-top: 1.5rem;
+  color: var(--text-light);
+  font-size: 0.9rem;
+}
+
+.link {
+  color: var(--brand-pink-darker);
+  font-weight: 600;
+  text-decoration: none;
+}
+.link:hover {
+  text-decoration: underline;
+}
+.googleButton {
+  background-color: var(--white);
+  color: #333;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+.googleButton:hover:not(:disabled) {
+  background-color: #f9f9f9;
+  transform: scale(1.02);
+}
+.googleButton svg {
+  font-size: 1.2rem;
+}
+
+.divider {
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--text-light);
+  margin: 1.5rem 0;
+  position: relative;
+}
+.divider::before,
+.divider::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 35%;
+  height: 1px;
+  background-color: var(--border-color);
+}
+.divider::before {
+  left: 0;
+}
+.divider::after {
+  right: 0;
+}

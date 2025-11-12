@@ -1,0 +1,106 @@
+/* === Biến Màu (Chủ đề Decharmix) === */
+:root {
+  --bg-cream: #ffffeb;
+  --bg-pink: #fff5f9;
+  --text-title: #be5985;
+  --text-main: #7c596b;
+  --brand-pink: #fe98bf;
+  --border-color: #ffe2f2;
+  --white: #ffffff;
+}
+
+.pageWrapper {
+  background-color: var(--bg-cream);
+  min-height: 90vh;
+  padding: 4rem 1rem;
+}
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 2.5rem;
+  box-shadow: 0 10px 30px rgba(255, 226, 242, 0.7);
+}
+.title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--text-title);
+  margin-bottom: 0.5rem;
+}
+.subtitle {
+  font-size: 1.1rem;
+  color: var(--text-main);
+  margin-bottom: 2rem;
+}
+
+/* Thanh thông tin Xu & Lượt */
+.statsBar {
+  display: flex;
+  justify-content: space-around;
+  gap: 1rem;
+  background-color: var(--bg-pink);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 2rem;
+}
+.statItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  color: var(--text-main);
+}
+.statItem svg {
+  color: var(--brand-pink);
+  font-size: 1.25rem;
+}
+.statItem strong {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-title);
+}
+
+/* Vòng quay */
+.wheelContainer {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Thư viện Wheel dùng 'canvas', cần bọc nó lại */
+}
+/* Nút Quay (nằm giữa vòng quay) */
+.spinButton {
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background-color: var(--brand-pink);
+  color: var(--white);
+  border: 6px solid var(--white);
+  font-size: 1.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+.spinButton:hover {
+  background-color: var(--text-title);
+  transform: scale(1.05);
+}
+.spinButton:disabled {
+  background-color: var(--text-light);
+  cursor: not-allowed;
+  transform: scale(1);
+}
+
+.resultMessage {
+  margin-top: 2rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-title);
+}

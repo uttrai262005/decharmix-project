@@ -1,0 +1,195 @@
+/* Dùng cho trang /gamification */
+
+.errorBox {
+  background-color: #fee2e2;
+  color: #dc2626;
+  padding: 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Bảng chỉnh sửa */
+.prizeTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.prizeTable th,
+.prizeTable td {
+  padding: 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: middle;
+}
+
+.prizeTable th {
+  color: var(--text-main, #7c596b);
+  font-size: 0.9rem;
+}
+
+.prizeTable input,
+.prizeTable select {
+  width: 100%;
+  padding: 0.6rem;
+  font-size: 0.95rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+}
+.prizeTable input:focus,
+.prizeTable select:focus {
+  background-color: var(--white, #ffffff);
+  border-color: var(--brand-pink, #fe98bf);
+  outline: none;
+}
+
+/* Cột Tỷ lệ */
+.prizeTable input[type="number"] {
+  width: 70px; /* Thu hẹp cột tỷ lệ */
+}
+
+/* Dòng Total */
+.prizeTable tfoot td {
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-align: right;
+  padding: 1rem 0.5rem;
+}
+.prizeTable tfoot .totalOk {
+  color: #16a34a; /* Xanh lá */
+}
+.prizeTable tfoot .totalError {
+  color: #dc2626; /* Đỏ */
+}
+
+/* === BẮT ĐẦU SỬA LỖI: CSS VÒNG QUAY === */
+.wheelContainer {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  margin: 2rem auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.wheel {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  position: relative;
+  overflow: hidden;
+  border: 8px solid #fff;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  /* 8 múi, mỗi múi 45deg */
+  --slice-angle: 45deg;
+}
+
+.slice {
+  position: absolute;
+  width: 50%;
+  height: 100%;
+  left: 50%;
+  top: 0;
+  /* (var(--i) sẽ được set từ 0-7) */
+  transform: rotate(calc(var(--slice-angle) * var(--i)));
+  transform-origin: 0 50%;
+
+  /* === DÒNG QUAN TRỌNG BỊ THIẾU === */
+  /* Cắt div thành hình tam giác (múi) */
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Tô màu xen kẽ */
+.slice:nth-child(odd) {
+  background-color: var(--bg-pink, #fff5f9);
+}
+.slice:nth-child(even) {
+  background-color: #fde2f3;
+}
+
+/* Chữ bên trong múi */
+.slice span {
+  display: block;
+  transform: rotate(calc(var(--slice-angle) / 2));
+  padding-left: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-title, #be5985);
+  max-width: 100px;
+  word-wrap: break-word;
+}
+
+/* Kim quay */
+.wheelSpinner {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  border-top: 30px solid var(--text-title, #be5985);
+  top: -10px; /* Nhô ra ngoài 1 chút */
+  z-index: 10;
+}
+.wheelSpinner::after {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background-color: var(--white, #fff);
+  border: 4px solid var(--text-title, #be5985);
+  border-radius: 50%;
+  top: -35px;
+  left: -10px;
+}
+/* === KẾT THÚC SỬA LỖI VÒNG QUAY === */
+
+/* === CSS CHO NÚT (Thêm ở bước 127) === */
+.actionGroup {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.saveButton,
+.deleteButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Nút Lưu (Save) */
+.saveButton {
+  background-color: #eff6ff; /* Xanh dương nhạt */
+  color: #2563eb; /* Xanh dương đậm */
+}
+.saveButton:hover:not(:disabled) {
+  background-color: #dbeafe;
+}
+.saveButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Nút Xóa (Delete) */
+.deleteButton {
+  background-color: #fee2e2; /* Đỏ nhạt */
+  color: #dc2626; /* Đỏ đậm */
+}
+.deleteButton:hover {
+  background-color: #fecaca;
+}

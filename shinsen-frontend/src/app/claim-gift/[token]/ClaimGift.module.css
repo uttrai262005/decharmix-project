@@ -1,0 +1,88 @@
+/* Dùng lại biến màu của bạn */
+:root {
+  --bg-cream: #ffffeb;
+  --bg-pink: #fff5f9;
+  --text-title: #be5985;
+  --text-main: #7c596b;
+  --brand-pink: #fe98bf;
+  --brand-pink-darker: #be5985;
+  --border-color: #ffe2f2;
+  --white: #ffffff;
+}
+
+.pageWrapper {
+  background-color: var(--bg-cream);
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+.container {
+  background-color: var(--white);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 500px;
+}
+.centered {
+  text-align: center;
+}
+.title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-title);
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+.message {
+  border-left: 4px solid var(--brand-pink);
+  padding-left: 1rem;
+  font-style: italic;
+  color: var(--text-main);
+  background-color: var(--bg-pink);
+  padding: 1rem;
+  border-radius: 0 8px 8px 0;
+  margin: 1.5rem 0;
+}
+.button {
+  background-color: var(--brand-pink);
+  color: var(--white);
+  padding: 0.8rem 2rem;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  margin-top: 1.5rem;
+  width: 100%;
+}
+.button:hover {
+  background-color: var(--brand-pink-darker);
+}
+
+/* Form */
+.inputGroup {
+  margin-bottom: 1rem;
+}
+.inputGroup label {
+  display: block;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 0.5rem;
+}
+.inputGroup input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+}
+.errorText {
+  color: #ef4444;
+  margin-top: 1rem;
+  text-align: center;
+}

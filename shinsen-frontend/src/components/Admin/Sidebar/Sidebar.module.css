@@ -1,0 +1,56 @@
+.sidebar {
+  width: 250px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  background-color: #ffffff; /* Màu trắng */
+  border-right: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--text-title, #be5985); /* Dùng màu hồng */
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.nav {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow-y: auto;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  color: var(--text-main, #7c596b); /* Màu chữ chính */
+  transition: all 0.3s ease;
+}
+
+.navItem svg {
+  font-size: 1.25rem;
+}
+
+.navItem:hover {
+  background-color: var(--bg-pink, #fff5f9); /* Nền hồng nhạt */
+  color: var(--text-title, #be5985); /* Chữ hồng đậm */
+}
+
+.navItem.active {
+  background-color: var(--brand-pink, #fe98bf); /* Nền hồng */
+  color: var(--white, #ffffff);
+  box-shadow: 0 4px 8px rgba(254, 152, 191, 0.3);
+}

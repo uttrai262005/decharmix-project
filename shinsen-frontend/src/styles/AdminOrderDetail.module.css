@@ -1,0 +1,173 @@
+/* Dùng cho trang /orders/[id] */
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.statusBox {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.statusSelect {
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: var(--white, #ffffff);
+  font-weight: 600;
+  color: var(--text-title, #be5985);
+}
+
+.updateButton {
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: 8px;
+  background-color: var(--brand-pink, #fe98bf);
+  color: var(--white, #ffffff);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.updateButton:hover:not(:disabled) {
+  background-color: var(--brand-pink-darker, #be5985);
+}
+.updateButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Layout */
+.layoutGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* 66% và 33% */
+  gap: 1.5rem;
+}
+@media (max-width: 900px) {
+  .layoutGrid {
+    grid-template-columns: 1fr; /* Chuyển 1 cột trên mobile */
+  }
+}
+
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Thẻ chung */
+.card {
+  background-color: var(--white, #ffffff);
+  border-radius: 12px;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  padding: 1.5rem;
+}
+
+.cardTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-title, #be5985);
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.card p {
+  color: var(--text-main, #7c596b);
+  line-height: 1.7;
+  margin-bottom: 0.5rem;
+}
+
+/* Danh sách sản phẩm */
+.itemRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.itemImage {
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid #f0f0f0;
+}
+.itemInfo {
+  flex-grow: 1;
+}
+.itemName {
+  font-weight: 600;
+  color: #333;
+  display: block;
+}
+.itemQty {
+  font-size: 0.9rem;
+  color: var(--text-main, #7c596b);
+}
+.itemTotal {
+  font-weight: 700;
+  color: #333;
+}
+
+/* Tính tiền */
+.costSummary {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #f0f0f0;
+}
+.costRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  color: var(--text-main, #7c596b);
+  font-weight: 500;
+}
+.costRow.discount {
+  color: #16a34a; /* Xanh lá */
+}
+.costRow.grandTotal {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-title, #be5985);
+  margin-top: 1rem;
+}
+
+/* Thông tin thanh toán / quà */
+.paymentMethod {
+  font-weight: 600;
+}
+.paymentMethod span {
+  text-transform: uppercase;
+  color: var(--text-title, #be5985);
+  background-color: var(--bg-pink, #fff5f9);
+  padding: 3px 8px;
+  border-radius: 6px;
+  margin-left: 0.5rem;
+}
+.paymentStatus span {
+  text-transform: capitalize;
+  font-weight: 700;
+  color: #3b82f6; /* Xanh dương */
+  margin-left: 0.5rem;
+}
+.pending {
+  font-weight: 600;
+  color: #f97316; /* Cam */
+}
+.divider {
+  border: none;
+  border-top: 1px solid #f0f0f0;
+  margin: 1rem 0;
+}

@@ -1,0 +1,123 @@
+/* === Biến Màu (Chủ đề Decharmix) === */
+:root {
+  --bg-cream: #ffffeb;
+  --bg-pink: #fff5f9;
+  --text-title: #be5985;
+  --text-main: #7c596b;
+  --brand-pink: #fe98bf;
+  --brand-pink-darker: #be5985; /* Màu hover */
+  --border-color: #ffe2f2;
+  --white: #ffffff;
+  --text-light: #777777;
+}
+
+.pageWrapper {
+  background-color: var(--bg-cream);
+  min-height: 90vh;
+  padding: 4rem 1rem;
+}
+.container {
+  max-width: 900px; /* Rộng hơn 1 chút cho trang hub */
+  margin: 0 auto;
+  text-align: center;
+}
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-title);
+  margin-bottom: 0.5rem;
+}
+.subtitle {
+  font-size: 1.1rem;
+  color: var(--text-main);
+  margin-bottom: 2.5rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* === Lưới Game === */
+.gameGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+/* Hiển thị 2 cột trên Desktop */
+@media (min-width: 768px) {
+  .gameGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.gameCard {
+  background-color: var(--white);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 12px rgba(255, 226, 242, 0.3);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+  text-align: left;
+}
+.gameCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(255, 226, 242, 0.7);
+}
+
+.gameImageWrapper {
+  position: relative;
+  width: 100%;
+  height: 200px; /* Chiều cao cố định cho ảnh banner game */
+  flex-shrink: 0;
+}
+.gameImage {
+  transition: transform 0.5s ease;
+}
+.gameCard:hover .gameImage {
+  transform: scale(1.1);
+}
+.gameContent {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-grow: 1;
+}
+.gameTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-title);
+  margin-bottom: 0.5rem;
+}
+.gameDescription {
+  font-size: 0.95rem;
+  color: var(--text-main);
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+.gameButton {
+  margin-top: auto;
+  align-self: flex-start; /* Nút ở bên trái */
+  background-color: var(--brand-pink);
+  color: var(--white);
+  padding: 0.7rem 1.5rem;
+  border-radius: 50px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+.gameButton:hover {
+  background-color: var(--brand-pink-darker);
+  transform: scale(1.05);
+}
+/* Nút cho game "Sắp ra mắt" */
+.gameButtonDisabled {
+  background-color: var(--text-light);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+.gameButtonDisabled:hover {
+  background-color: var(--text-light);
+  transform: none;
+}

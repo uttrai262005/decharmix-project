@@ -1,0 +1,251 @@
+/* --- src/components/Header.module.css --- */
+
+.header {
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  width: 100%;
+}
+
+.nav {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #166534; /* green-800 */
+}
+
+.navLinks {
+  display: none; /* Ẩn trên mobile */
+}
+@media (min-width: 768px) {
+  .navLinks {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    font-weight: 500;
+    color: #374151; /* gray-700 */
+  }
+  .navLinks a:hover {
+    color: #16a34a; /* green-600 */
+  }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+/* --- AUTH BUTTONS --- */
+.authActions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.welcomeMessage {
+  display: none; /* Ẩn trên mobile */
+}
+@media (min-width: 768px) {
+  .welcomeMessage {
+    display: inline;
+    color: #4b5563; /* gray-600 */
+  }
+}
+.logoutButton {
+  padding: 0.5rem 1rem;
+  background-color: #fee2e2; /* red-100 */
+  color: #b91c1c; /* red-700 */
+  border-radius: 6px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+.logoutButton:hover {
+  background-color: #fecaca; /* red-200 */
+}
+.loginLink {
+  font-weight: 500;
+  color: #374151;
+}
+.loginLink:hover {
+  color: #16a34a;
+}
+.registerButton {
+  padding: 0.5rem 1rem;
+  background-color: #16a34a;
+  color: white;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+.registerButton:hover {
+  background-color: #15803d;
+}
+
+/* --- CART ICON & MINI CART --- */
+.cartIconWrapper {
+  position: relative;
+}
+
+.cartButton {
+  position: relative;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #374151;
+}
+
+.cartBadge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #ef4444; /* red-500 */
+  color: white;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.miniCart {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.75rem;
+  width: 320px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f3f4f6; /* gray-100 */
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+}
+
+.miniCartHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+.miniCartHeader h3 {
+  font-weight: 600;
+  color: #1f2937;
+}
+.miniCartHeader button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6b7280;
+}
+
+.miniCartItems {
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 0.5rem;
+}
+
+.miniCartItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  border-radius: 6px;
+}
+.miniCartItem:hover {
+  background-color: #f9fafb; /* gray-50 */
+}
+
+.itemImage {
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.itemDetails {
+  flex-grow: 1;
+}
+
+.itemName {
+  font-weight: 500;
+  color: #374151;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+}
+
+.itemPrice {
+  font-size: 0.9rem;
+  color: #6b7280; /* gray-500 */
+}
+
+.miniCartFooter {
+  padding: 1rem;
+  border-top: 1px solid #f3f4f6;
+}
+
+.subtotal {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 1rem;
+}
+
+.viewCartButton {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 0.75rem;
+  background-color: #16a34a;
+  color: white;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+.viewCartButton:hover {
+  background-color: #15803d;
+}
+
+.emptyMessage {
+  padding: 2rem;
+  text-align: center;
+  color: #6b7280;
+}
+/* SỬA CLASS NÀY: Thêm max-height và overflow-y */
+.searchResults {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  max-height: 400px; /* Giới hạn chiều cao tối đa */
+  overflow-y: auto; /* Tự động thêm thanh cuộn khi cần */
+}
+
+/* THÊM CLASS MỚI NÀY */
+.noResults {
+  padding: 1rem;
+  text-align: center;
+  color: #888;
+}

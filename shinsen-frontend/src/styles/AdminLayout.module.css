@@ -1,0 +1,21 @@
+/* :root { (Biến màu của bạn ở global.css) } */
+
+.adminLayout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f7f8fa; /* Màu nền xám nhạt */
+}
+
+.mainContent {
+  flex-grow: 1;
+  /* Chiều rộng bằng 100% trừ đi chiều rộng Sidebar (250px) */
+  width: calc(100% - 250px);
+  margin-left: 250px; /* Để chừa chỗ cho Sidebar */
+}
+
+.contentWrapper {
+  /* Đây là vùng nội dung chính */
+  padding: 2.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}

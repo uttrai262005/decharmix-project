@@ -1,0 +1,223 @@
+:root {
+  --bg-cream: #ffffeb;
+  --bg-pink: #fff5f9;
+  --text-title: #be5985;
+  --text-main: #7c596b;
+  --brand-pink: #fe98bf;
+  --border-color: #ffe2f2;
+  --white: #ffffff;
+  --green: #22c55e;
+}
+
+.pageWrapper {
+  background-color: var(--bg-cream);
+  min-height: 90vh;
+  padding: 4rem 1rem;
+}
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 2.5rem;
+  box-shadow: 0 10px 30px rgba(255, 226, 242, 0.7);
+  position: relative;
+  overflow: hidden;
+  min-height: 600px;
+}
+.title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--text-title);
+  margin-bottom: 0.5rem;
+}
+.subtitle {
+  font-size: 1.1rem;
+  color: var(--text-main);
+  margin-bottom: 2rem;
+}
+.statsBar {
+  display: flex;
+  justify-content: space-around;
+  gap: 1rem;
+  background-color: var(--bg-pink);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 2.5rem;
+}
+.statItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  color: var(--text-main);
+}
+.statItem svg {
+  color: var(--brand-pink);
+  font-size: 1.25rem;
+}
+.statItem strong {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-title);
+}
+
+/* --- Màn hình Chờ (Idle) --- */
+.gameIntro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+}
+.gameIntro p {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-title);
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+}
+.playButton {
+  background-color: var(--brand-pink);
+  color: var(--white);
+  padding: 0.8rem 2rem;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.playButton:hover {
+  background-color: var(--text-title);
+}
+.playButton:disabled {
+  background-color: var(--text-light);
+  cursor: not-allowed;
+}
+.loaderIcon {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* --- Màn hình Chơi (Playing) --- */
+.playingArea {
+  animation: fadeIn 0.5s ease;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.gameInfo {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 1.5rem;
+}
+.infoBox {
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  width: 120px;
+}
+.infoBox span {
+  font-size: 0.9rem;
+  color: var(--text-main);
+  display: block;
+}
+.infoBox strong {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-title);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* Lưới thẻ */
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  perspective: 1000px;
+}
+.cardBack,
+.cardFront {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  font-size: 3rem;
+}
+.cardBack {
+  background: linear-gradient(
+    135deg,
+    var(--brand-pink),
+    var(--brand-pink-darker)
+  );
+  color: var(--white);
+  cursor: pointer;
+  font-weight: 700;
+  transition: transform 0.3s;
+}
+.cardBack:hover {
+  transform: scale(1.05);
+}
+.cardFront {
+  background-color: var(--bg-pink);
+  border: 2px solid var(--border-color);
+  color: var(--text-title);
+}
+.cardFront.matched {
+  background-color: var(--green);
+  border-color: var(--green);
+  color: var(--white);
+  transform: scale(1.05);
+  box-shadow: 0 0 15px var(--green);
+}
+
+/* --- Màn hình Kết quả (Won/Lost) --- */
+.gameResult {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  animation: fadeIn 0.5s ease;
+}
+.resultIcon {
+  font-size: 4rem;
+}
+.resultTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-title);
+  margin-top: 1rem;
+}
+.resultMessage {
+  font-size: 1.1rem;
+  color: var(--text-main);
+  margin-top: 0.5rem;
+  margin-bottom: 2rem;
+}

@@ -1,0 +1,144 @@
+/* === Biến Màu (Chủ đề Vàng Kem & Hồng Nhạt) === */
+:root {
+  --primary-accent: #fe98bf; /* Hồng nhạt (cho nút, hover) */
+  --secondary-accent: #f6bcf1; /* Hồng tím nhạt */
+  --light-pink: #ffe2f2; /* Hồng kem (cho viền, nền active) */
+  --bg-pink: #fff5f9; /* Nền hồng siêu nhạt (cho hover) */
+  --text-title: #be5985; /* Hồng đậm (cho tiêu đề, logo) */
+  --text-main: #7c596b; /* Hồng xám/nâu (cho text thường) */
+  --text-light: #a18c96; /* Hồng xám nhạt (cho sub-text) */
+  --border-color: #ffe2f2; /* Viền hồng kem */
+  --white: #ffffff;
+  --gray-bg: #f3f4f6; /* Màu xám cho input read-only */
+  --gray-text: #6b7280;
+}
+
+/* --- Tiêu đề trang (ví dụ: "Thông tin tài khoản") --- */
+.title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color); /* Viền hồng */
+  margin-bottom: 2rem;
+  color: var(--text-title); /* Chữ hồng đậm */
+}
+
+/* --- Khu vực Avatar --- */
+.avatarSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.avatarPreviewWrapper {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  cursor: pointer;
+  overflow: hidden;
+  border: 4px solid var(--white);
+  /* Shadow hồng nhạt */
+  box-shadow: 0 4px 12px rgba(255, 226, 242, 0.6);
+}
+
+.avatarPreviewImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cameraOverlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 35%;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.avatarPreviewWrapper:hover .cameraOverlay {
+  opacity: 1;
+}
+
+.uploadButton {
+  padding: 0.6rem 1.2rem;
+  background-color: var(--primary-accent); /* Nút màu hồng */
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.uploadButton:hover {
+  background-color: var(--secondary-accent);
+}
+
+/* --- Form thông tin --- */
+.infoForm {
+  margin-top: 1rem;
+}
+
+.infoGrid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.infoItem label {
+  display: block;
+  font-weight: 500;
+  color: var(--text-main); /* Chữ hồng xám */
+  margin-bottom: 0.5rem;
+}
+
+/* Style chung cho input và p (ô read-only) */
+.infoItem p,
+.infoItem input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color); /* Viền hồng */
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: var(--white);
+  color: var(--text-main);
+}
+
+.infoItem input:focus {
+  outline: none;
+  border-color: var(--primary-accent);
+  box-shadow: 0 0 0 3px var(--light-pink);
+}
+
+/* Style riêng cho ô không thể sửa (read-only) */
+.readOnlyInput {
+  background-color: var(--gray-bg);
+  color: var(--gray-text);
+  cursor: not-allowed;
+}
+
+/* Nút Lưu thay đổi */
+.saveButton {
+  margin-top: 2rem;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--primary-accent); /* Nút màu hồng */
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.saveButton:hover {
+  background-color: var(--secondary-accent); /* Hover ra hồng tím */
+}

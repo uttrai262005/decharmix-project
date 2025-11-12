@@ -1,0 +1,312 @@
+:root {
+  --bg-cream: #ffffeb;
+  --bg-pink: #fff5f9;
+  --text-title: #be5985;
+  --text-main: #7c596b;
+  --brand-pink: #fe98bf;
+  --border-color: #ffe2f2;
+  --white: #ffffff;
+  --red: #ef4444;
+}
+
+/* --- Layout chung --- */
+.pageWrapper {
+  background-color: var(--bg-cream);
+  min-height: 90vh;
+  padding: 2rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.container {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  text-align: center;
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 10px 30px rgba(255, 226, 242, 0.7);
+  position: relative;
+  overflow: hidden;
+}
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-title);
+  margin-bottom: 0.25rem;
+}
+.subtitle {
+  font-size: 1rem;
+  color: var(--text-main);
+  margin-bottom: 1.5rem;
+}
+.statsBar {
+  display: flex;
+  justify-content: space-around;
+  gap: 1rem;
+  background-color: var(--bg-pink);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+.statItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text-main);
+}
+.statItem svg {
+  color: var(--brand-pink);
+}
+.statItem strong {
+  font-size: 1.1rem;
+  color: var(--text-title);
+}
+
+/* --- Khu vực Game --- */
+.gameArea {
+  width: 100%;
+  height: 400px;
+  background-color: var(--bg-pink);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  cursor: none;
+  user-select: none;
+}
+
+/* --- Vệt chém chuột (MỚI) --- */
+.sliceTrailPoint {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  background-color: var(--white);
+  border: 2px solid var(--brand-pink);
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  /* === SỬA LỖI 3: Giảm z-index === */
+  z-index: 50;
+  box-shadow: 0 0 10px var(--brand-pink);
+  transition: opacity 0.3s ease-out;
+}
+
+/* --- Màn hình chờ (Idle) & Kết quả (Won/Lost) --- */
+.overlayScreen {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 245, 249, 0.9);
+  /* === SỬA LỖI 4: Tăng z-index (cao hơn vệt chém) === */
+  z-index: 100;
+  animation: fadeIn 0.3s ease;
+  padding: 1rem;
+  pointer-events: all;
+  cursor: default;
+}
+.playButton {
+  background-color: var(--brand-pink);
+  color: var(--white);
+  padding: 0.8rem 2rem;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.playButton:hover {
+  background-color: var(--text-title);
+}
+.playButton:disabled {
+  background-color: var(--text-light);
+  cursor: not-allowed;
+}
+.loaderIcon {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.resultIcon {
+  font-size: 4rem;
+}
+.resultTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-title);
+}
+.resultMessage {
+  font-size: 1.1rem;
+  color: var(--text-main);
+  margin: 0.5rem 0 1.5rem;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* --- Các vật thể trong game (Playing) --- */
+.gameHud {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-title);
+  text-shadow: 0 0 5px var(--white);
+  z-index: 10;
+  pointer-events: none;
+}
+.misses {
+  display: flex;
+  gap: 0.25rem;
+}
+.heartIcon {
+  color: var(--red);
+  font-size: 1.5rem;
+}
+.heartIconMissed {
+  color: #ccc;
+  font-size: 1.5rem;
+}
+
+.itemContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.gameItem {
+  position: absolute;
+  bottom: -50px;
+  font-size: 3rem;
+  user-select: none;
+  animation-name: flyUp;
+  animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
+  animation-fill-mode: forwards;
+  transform: translateX(-50%);
+  z-index: 5;
+
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+}
+
+/* --- Hiệu ứng bị chém cho Charm --- */
+
+/* Icon gốc (💖) */
+.charmIcon {
+  color: var(--brand-pink);
+  pointer-events: none;
+}
+.bombIcon {
+  pointer-events: none;
+}
+
+/* Hai nửa (Ẩn ban đầu) */
+.charmHalfLeft,
+.charmHalfRight {
+  display: none;
+}
+
+/* Khi item bị chém (Charm) */
+.gameItem.slicedCharm {
+  animation: none !important;
+  pointer-events: none;
+  background: none;
+}
+.gameItem.slicedCharm .charmIcon {
+  display: none; /* Ẩn icon gốc */
+}
+.gameItem.slicedCharm .charmHalfLeft,
+.gameItem.slicedCharm .charmHalfRight {
+  display: block;
+  position: absolute;
+  color: var(--brand-pink);
+  font-size: 3rem;
+  line-height: 1;
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
+  opacity: 1;
+}
+/* Nửa trái bay sang trái và xoay */
+.gameItem.slicedCharm .charmHalfLeft {
+  animation-name: splitLeft;
+  animation-duration: 0.4s;
+}
+/* Nửa phải bay sang phải và xoay */
+.gameItem.slicedCharm .charmHalfRight {
+  animation-name: splitRight;
+  animation-duration: 0.4s;
+}
+
+/* Khi item bị chém (Bomb) */
+.gameItem.slicedBomb {
+  animation: slicedBombAnim 0.3s ease-out forwards !important;
+  pointer-events: none;
+  color: var(--red);
+}
+/* ---------------------------------- */
+
+/* Animation Bay (Fruit Ninja) */
+@keyframes flyUp {
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-350px) rotate(180deg);
+  }
+  100% {
+    transform: translateY(100px) rotate(360deg);
+  }
+}
+
+/* Animation "tách đôi" cho charm */
+@keyframes splitLeft {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-40px, -30px) rotate(-60deg) scale(0.8);
+    opacity: 0;
+  }
+}
+@keyframes splitRight {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(40px, -30px) rotate(60deg) scale(0.8);
+    opacity: 0;
+  }
+}

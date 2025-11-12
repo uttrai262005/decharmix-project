@@ -1,0 +1,233 @@
+/* === TOÀN BỘ CSS MỚI - TINH TẾ & NHIỀU MÀU XANH HƠN === */
+
+/* --- TỔNG QUAN & NỀN TRANG --- */
+.pageWrapper {
+  max-width: 1200px;
+  margin: 2.5rem auto;
+  padding: 0 1rem;
+  background-color: #f0fdf4; /* Nền xanh lá cây rất nhạt (green-50) */
+}
+
+.pageTitle {
+  font-size: 2.25rem;
+  font-weight: 500; /* Giảm độ đậm cho thanh lịch hơn */
+  margin-bottom: 2.5rem;
+  text-align: center;
+  color: #14532d; /* Xanh lá cây rất đậm (green-900) */
+}
+
+/* --- KHI GIỎ HÀNG RỖNG --- */
+.centeredMessage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  text-align: center;
+  font-size: 1.1rem;
+  color: #166534; /* green-800 */
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid #dcfce7; /* green-200 */
+}
+
+.continueShopping {
+  margin-top: 1.5rem;
+  padding: 0.8rem 1.8rem;
+  background-color: #22c55e; /* green-500 */
+  color: white;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+.continueShopping:hover {
+  background-color: #16a34a; /* green-600 */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* --- LAYOUT CHÍNH --- */
+.mainLayout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+@media (min-width: 1024px) {
+  .mainLayout {
+    grid-template-columns: 2.2fr 1fr;
+  }
+}
+
+.itemsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* --- DÒNG SẢN PHẨM --- */
+.itemRow {
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem;
+  background-color: white;
+  border-radius: 12px; /* Bo tròn nhiều hơn */
+  border: 1px solid #dcfce7; /* Viền xanh nhạt (green-200) */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  gap: 1rem;
+}
+.itemRow:hover {
+  border-color: #86efac; /* green-300 */
+  box-shadow: 0 4px 12px rgba(134, 239, 172, 0.2);
+}
+
+@media (min-width: 768px) {
+  .itemRow {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.itemInfo {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-grow: 1;
+}
+
+.itemImageWrapper {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.itemName {
+  font-weight: 600;
+  color: #14532d; /* green-900 */
+}
+
+.itemPrice {
+  color: #16a34a; /* green-600 */
+  font-weight: 600;
+}
+
+.itemActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  width: 100%;
+}
+@media (min-width: 768px) {
+  .itemActions {
+    width: auto;
+    justify-content: flex-end;
+  }
+}
+
+/* --- BỘ CHỌN SỐ LƯỢNG --- */
+.quantitySelector {
+  display: flex;
+  align-items: center;
+  border: 1px solid #bbf7d0; /* green-200 */
+  border-radius: 8px;
+  background-color: #f0fdf4; /* green-50 */
+}
+.quantitySelector button {
+  background: none;
+  border: none;
+  padding: 0.6rem;
+  cursor: pointer;
+  color: #16a34a; /* green-600 */
+}
+.quantitySelector button:hover {
+  color: #14532d; /* green-900 */
+}
+.quantitySelector span {
+  padding: 0 0.8rem;
+  font-weight: 600;
+  color: #15803d; /* green-700 */
+}
+
+.itemSubtotal {
+  font-weight: 700;
+  color: #14532d; /* green-900 */
+  min-width: 110px;
+  text-align: right;
+}
+
+.removeButton {
+  background: none;
+  border: none;
+  color: #78716c; /* stone-500 */
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+.removeButton:hover {
+  color: #dc2626; /* red-600 */
+  background-color: #fee2e2; /* red-100 */
+}
+
+/* --- KHUNG TÓM TẮT ĐƠN HÀNG --- */
+.summary {
+  background-color: white;
+  border: 1px solid #dcfce7; /* green-200 */
+  border-radius: 12px;
+  padding: 2rem;
+  height: fit-content;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.summaryTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #14532d; /* green-900 */
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  color: #166534; /* green-800 */
+}
+
+.summaryTotal {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #14532d; /* green-900 */
+  padding-top: 1.5rem;
+  border-top: 1px solid #bbf7d0; /* green-200 */
+}
+
+.checkoutButton {
+  width: 100%;
+  padding: 0.9rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  background-color: #16a34a; /* green-600 */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  margin-top: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  display: block; /* 1. Chuyển nút thành phần tử block */
+  width: fit-content; /* 2. (Tùy chọn) Giúp nút chỉ rộng bằng nội dung */
+  margin: 20px auto 0;
+}
+.checkoutButton:hover {
+  background-color: #15803d; /* green-700 */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(22, 163, 74, 0.3);
+}

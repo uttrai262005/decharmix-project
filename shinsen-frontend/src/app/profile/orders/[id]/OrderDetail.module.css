@@ -1,0 +1,248 @@
+/* === Biến Màu (Chủ đề Vàng Kem & Hồng Nhạt) === */
+:root {
+  --primary-accent: #fe98bf; /* Hồng nhạt (cho nút, hover) */
+  --secondary-accent: #f6bcf1; /* Hồng tím nhạt */
+  --light-pink: #ffe2f2; /* Hồng kem (cho viền, nền nhẹ) */
+  --bg-pink: #fff5f9; /* Nền hồng siêu nhạt */
+  --bg-cream: #ffffeb; /* Nền vàng kem nhạt */
+  --text-title: #be5985; /* Hồng đậm (cho tiêu đề, logo) */
+  --text-main: #7c596b; /* Hồng xám/nâu (cho text thường) */
+  --text-light: #a18c96; /* Hồng xám nhạt (cho sub-text) */
+  --border-color: #ffe2f2; /* Viền hồng kem */
+  --white: #ffffff;
+  --status-pending: #f59e0b; /* Màu vàng */
+  --status-shipping: #3b82f6; /* Màu xanh dương */
+  --status-completed: #22c55e; /* Màu xanh lá */
+  --status-cancelled: #ef4444; /* Màu đỏ */
+}
+
+.detailWrapper {
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(255, 226, 242, 0.4);
+  overflow: hidden;
+}
+
+.message {
+  text-align: center;
+  color: var(--text-light);
+  padding: 3rem;
+  font-size: 1.1rem;
+}
+
+.detailHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.5rem;
+  background-color: var(--bg-pink);
+  border-bottom: 1px solid var(--border-color);
+}
+
+@media (min-width: 768px) {
+  .detailHeader {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.orderTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-title);
+}
+
+.detailGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  padding: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .detailGrid {
+    grid-template-columns: 1.5fr 1fr;
+  }
+}
+
+.leftColumn,
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.section {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.sectionTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-title);
+  padding: 1rem 1.5rem;
+  background-color: var(--bg-pink);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Cột trái: Sản phẩm */
+.orderItemsList {
+  padding: 0;
+}
+
+.orderItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+.orderItem:last-child {
+  border-bottom: none;
+}
+.itemImage {
+  flex-shrink: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.itemInfo {
+  flex-grow: 1;
+}
+.itemName {
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 0.25rem;
+}
+.itemQuantity {
+  font-size: 0.9rem;
+  color: var(--text-light);
+}
+.itemPrice {
+  font-weight: 600;
+  color: var(--text-title);
+  text-align: right;
+}
+
+/* Cột phải: Thông tin */
+.shippingInfo {
+  padding: 1.5rem;
+  color: var(--text-main);
+  line-height: 1.8;
+}
+.shippingInfo p {
+  margin: 0.25rem 0;
+  display: flex;
+  align-items: center;
+}
+.icon {
+  margin-right: 0.5rem;
+  flex-shrink: 0;
+}
+
+.costSummary {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.costRow {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-main);
+}
+.grandTotal {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-title);
+  margin-top: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--border-color);
+}
+.grandTotal span:last-child {
+  font-size: 1.5rem;
+}
+
+/* Nút bấm chân trang */
+.footerActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background-color: var(--bg-pink);
+  border-top: 1px solid var(--border-color);
+}
+
+.backButton,
+.reviewButton {
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+.backButton {
+  background-color: var(--white);
+  border: 1px solid var(--primary-accent);
+  color: var(--primary-accent);
+}
+.backButton:hover {
+  background-color: var(--light-pink);
+}
+.reviewButton {
+  background-color: var(--primary-accent);
+  border: 1px solid var(--primary-accent);
+  color: var(--white);
+}
+.reviewButton:hover {
+  background-color: var(--secondary-accent);
+}
+
+/* Các trạng thái (lấy từ file trước) */
+.statusPending,
+.statusProcessing,
+.statusShipping,
+.statusCompleted,
+.statusCancelled,
+.statusDefault {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+.statusPending {
+  color: #d97706;
+  background-color: #fef3c7;
+}
+.statusProcessing {
+  color: #d97706;
+  background-color: #fef3c7;
+}
+.statusShipping {
+  color: #2563eb;
+  background-color: #dbeafe;
+}
+.statusCompleted {
+  color: #16a34a;
+  background-color: #dcfce7;
+}
+.statusCancelled {
+  color: #dc2626;
+  background-color: #fee2e2;
+}
+.statusDefault {
+  color: var(--text-light);
+  background-color: #f3f4f6;
+}

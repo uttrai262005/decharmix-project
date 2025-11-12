@@ -1,0 +1,16 @@
+# === Backend (Node.js) ===
+shinsen-backend/node_modules
+shinsen-backend/.env
+shinsen-backend/npm-debug.log*
+
+# === Frontend (Next.js) ===
+shinsen-frontend/node_modules
+shinsen-frontend/.next
+shinsen-frontend/out
+shinsen-frontend/.env.local
+shinsen-frontend/.env.development.local
+shinsen-frontend/.env.production.local
+shinsen-frontend/npm-debug.log*
+
+# (Các file rác chung của HĐH)
+.DS_Store

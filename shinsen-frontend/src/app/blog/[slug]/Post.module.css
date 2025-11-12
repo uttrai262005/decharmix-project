@@ -1,0 +1,67 @@
+.postContainer {
+  max-width: 800px;
+  margin: 4rem auto;
+  padding: 0 1.5rem;
+}
+
+.postHeader {
+  margin-bottom: 2rem;
+}
+
+.postCategory {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.postTitle {
+  font-family: serif;
+  font-size: 3rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0.5rem 0 1rem 0;
+  line-height: 1.2;
+}
+
+.postMeta {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.postImageWrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 50%;
+  margin: 2rem 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.postContent {
+  font-size: 1.125rem;
+  line-height: 1.8;
+  color: #374151;
+}
+
+/* Style các thẻ HTML bên trong nội dung bài viết */
+.postContent :global(h2) {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #f0fdf4;
+  padding-bottom: 0.5rem;
+}
+
+.postContent :global(ul) {
+  list-style: disc;
+  padding-left: 2rem;
+  margin: 1rem 0;
+}
+
+.postContent :global(blockquote) {
+  border-left: 4px solid #16a34a;
+  padding-left: 1.5rem;
+  margin: 1.5rem 0;
+  font-style: italic;
+  color: #4b5563;
+}
