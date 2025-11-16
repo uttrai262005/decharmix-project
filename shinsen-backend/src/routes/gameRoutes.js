@@ -11,6 +11,7 @@ const {
   playSliceGame,
 
   // ADMIN
+  getWheelPrizes,
   getLuckyWheelSettings,
   updateLuckyWheelSettings,
   getSkillGameRewards,
@@ -24,6 +25,7 @@ const {
 // === SỬA LỖI: IMPORT TỪ 'authMiddleware' ===
 // (File 'adminMiddleware.js' ở [114] là tôi hướng dẫn sai, file này mới đúng)
 const { protect, adminMiddleware } = require("../middleware/authMiddleware");
+router.get("/wheel-prizes", getWheelPrizes);
 
 // ==============================
 // === ROUTES CHO NGƯỜI CHƠI ===
@@ -36,7 +38,6 @@ router.post("/memory-play", playMemoryGame);
 router.post("/whac-play", playWhacGame);
 router.post("/jump-play", playJumpGame);
 router.post("/slice-play", playSliceGame);
-
 // ==============================
 // === ROUTES CHO ADMIN ===
 // ==============================

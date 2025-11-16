@@ -487,3 +487,27 @@
 .giftBoxCta:hover svg {
   transform: rotate(-10deg) scale(1.1);
 }
+/* === THÊM VÀO CUỐI FILE Header.module.css === */
+
+/* --- Nút Tìm kiếm bằng Camera (AI) --- */
+.visualSearchButton {
+  background-color: var(--white); /* Nền trắng (giống input) */
+  color: var(--text-medium);
+  border: none;
+  border-left: 1px solid var(--border-color); /* Thêm 1 vạch ngăn */
+  padding: 0 1rem;
+  cursor: pointer;
+  font-size: 1.25rem; /* Icon 20px */
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.visualSearchButton:hover {
+  color: var(--primary-color);
+}
+
+/* (Chỉnh lại nút Search bằng chữ 1 chút) */
+.searchBar button[type="submit"] {
+  padding: 0.75rem 1rem; /* Giảm padding 1 chút */
+}

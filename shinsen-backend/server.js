@@ -13,6 +13,7 @@ const PORT = process.env.PORT || 5000; // Lấy cổng từ file .env, nếu kh�
 const customerRoutes = require("./src/routes/customerRoutes");
 const passport = require("passport");
 const session = require("express-session");
+const { initMobileNetModel } = require("./src/controllers/productController");
 require("./src/config/passport");
 app.use(express.static("public"));
 
@@ -61,4 +62,5 @@ app.use("/api/settings", settingsRoutes);
 // 5. Khởi động server
 app.listen(PORT, () => {
   console.log(`✅ Backend server đang chạy trên cổng ${PORT}`);
+  initMobileNetModel();
 });

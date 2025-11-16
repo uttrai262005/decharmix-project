@@ -1,0 +1,261 @@
+/* CSS Cho VisualSearchModal.tsx */
+
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal {
+  position: relative;
+  background-color: var(--white, #ffffff);
+  border-radius: 16px;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 1px solid var(--border-color, #ffe2f2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.closeButton {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--text-light, #a18c96);
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-title, #be5985);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* --- Vùng Upload --- */
+/* (Tìm rule .dropzone và THAY THẾ bằng code này) */
+
+.dropzone {
+  display: flex; /* <-- THÊM */
+  flex-direction: column; /* <-- THÊM */
+  align-items: center; /* <-- THÊM */
+  justify-content: center; /* <-- THÊM */
+  min-height: 250px; /* <-- THÊM (Để nó có chiều cao tối thiểu) */
+
+  border: 2px dashed var(--border-color, #ffe2f2);
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  background-color: var(--bg-pink, #fff5f9);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.dropzoneActive {
+  border-color: var(--brand-pink, #fe98bf);
+  background-color: #ffe2f2;
+}
+.dropzone p {
+  color: var(--text-main, #7c596b);
+  font-weight: 500;
+  margin: 0;
+}
+.uploadIcon {
+  font-size: 3rem;
+  color: var(--brand-pink, #fe98bf);
+  margin-bottom: 0.5rem;
+}
+.dropzoneOr {
+  font-size: 0.9rem;
+  color: var(--text-light, #a18c96);
+  margin: 0.5rem 0;
+}
+.browseButton {
+  font-weight: 700 !important;
+  color: var(--text-title, #be5985) !important;
+}
+.fileHint {
+  font-size: 0.8rem;
+  color: var(--text-light, #a18c96);
+  margin-top: 0.5rem !important;
+}
+
+/* --- Xem trước --- */
+.previewContainer {
+  position: relative;
+  width: 100%;
+  max-height: 300px;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #f0f0f0;
+}
+.removeImageButton {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+/* --- Nút Tìm kiếm --- */
+.searchButton {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--white, #ffffff);
+  background-color: var(--brand-pink, #fe98bf);
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+.searchButton:hover {
+  background-color: var(--brand-pink-darker, #be5985);
+}
+.searchButton:disabled {
+  background-color: #ffe2f2;
+  cursor: not-allowed;
+}
+
+/* --- Loader CSS --- */
+.loader {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #fff;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* --- Vùng Kết quả --- */
+.resultsContainer {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color, #ffe2f2);
+}
+.errorBox {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background-color: #fffbe6;
+  color: #b45309;
+  border: 1px solid #fef3c7;
+  border-radius: 8px;
+  font-weight: 500;
+}
+.resultsTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-title, #be5985);
+  margin-bottom: 1rem;
+}
+.resultsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+@media (min-width: 768px) {
+  .resultsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Thẻ sản phẩm Gợi ý (Thu nhỏ) */
+.resultCard {
+  text-decoration: none;
+  border-radius: 8px;
+  border: 1px solid var(--border-color, #ffe2f2);
+  background-color: var(--white, #ffffff);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+.resultCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(255, 226, 242, 0.7);
+}
+.resultImageWrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background-color: var(--bg-pink, #fff5f9);
+}
+.similarityBadge {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  background-color: rgba(190, 89, 133, 0.9);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 50px;
+}
+.resultContent {
+  padding: 0.75rem;
+}
+.resultCategory {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-light, #a18c96);
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+.resultName {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-main, #7c596b);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: 2.7em;
+  line-height: 1.5;
+}
+.resultPrice {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-title, #be5985);
+  margin-top: 0.5rem;
+}

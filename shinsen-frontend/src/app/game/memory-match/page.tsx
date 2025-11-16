@@ -57,7 +57,7 @@ export default function MemoryMatchPage() {
   useEffect(() => {
     if (user) {
       setUserCoins(user.coins);
-      fetch("/api/game/stats", {
+      fetch("/api/games/stats", {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then((res) => res.json())
@@ -88,7 +88,7 @@ export default function MemoryMatchPage() {
     setApiResult(null);
 
     try {
-      const response = await fetch("/api/game/memory-play", {
+      const response = await fetch("/api/games/memory-play", {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });

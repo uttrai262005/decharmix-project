@@ -31,7 +31,7 @@ interface OrderDetails {
   order_code: string;
   created_at: string;
   status: string;
-  total: number; // API trả về "total" (string hoặc number)
+  total: number;
   discount_amount: number;
   coin_discount_amount: number;
   payment_method: string;
@@ -54,6 +54,10 @@ const STATUS_OPTIONS = [
   { value: "cancelled", label: "Đã hủy" },
 ];
 
+// === SỬA LỖI 1: LẤY API URL ===
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+// =============================
+
 export default function AdminOrderDetailPage() {
   const { token } = useAuth();
   const params = useParams();
@@ -65,15 +69,17 @@ export default function AdminOrderDetailPage() {
   const [newStatus, setNewStatus] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
 
-  // 1. Tải chi tiết đơn hàng (Giữ nguyên)
+  // 1. Tải chi tiết đơn hàng
   useEffect(() => {
-    if (!token || !orderId) return;
+    if (!token || !orderId || !API_URL) return;
     const fetchOrder = async () => {
       try {
         setIsLoading(true);
-        const res = await fetch(`/api/orders/${orderId}`, {
+        // === SỬA LỖI 2: SỬA ĐƯỜNG DẪN FETCH ===
+        const res = await fetch(`${API_URL}/api/orders/${orderId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+        // ===================================
         if (!res.ok) throw new Error("Không thể tải chi tiết đơn hàng");
 
         const data: OrderDetails = await res.json();
@@ -89,12 +95,13 @@ export default function AdminOrderDetailPage() {
     fetchOrder();
   }, [token, orderId]);
 
-  // 2. Hàm cập nhật trạng thái (Giữ nguyên)
+  // 2. Hàm cập nhật trạng thái
   const handleUpdateStatus = async () => {
-    if (!token || !orderId || newStatus === order?.status) return;
+    if (!token || !orderId || newStatus === order?.status || !API_URL) return;
     setIsUpdating(true);
     try {
-      const res = await fetch(`/api/orders/${orderId}/status`, {
+      // === SỬA LỖI 3: SỬA ĐƯỜNG DẪN FETCH ===
+      const res = await fetch(`${API_URL}/api/orders/${orderId}/status`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -102,11 +109,22 @@ export default function AdminOrderDetailPage() {
         },
         body: JSON.stringify({ status: newStatus }),
       });
+      // ===================================
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Cập nhật thất bại");
 
-      setOrder(data.order);
+      // setOrder(data.order);
+      setOrder((prevOrder) => {
+        if (!prevOrder) return null; // Trường hợp dự phòng
+        // Giữ lại tất cả thông tin cũ (quan trọng nhất là mảng 'items')
+        // và chỉ cập nhật lại 'status' từ data mới
+        return {
+          ...prevOrder,
+          status: data.order.status,
+        };
+      });
+      setNewStatus(data.order.status); // (Cập nhật lại newStatus)
       toast.success(data.message);
     } catch (error: any) {
       console.error(error);
@@ -125,15 +143,11 @@ export default function AdminOrderDetailPage() {
     return <div className={styles.pageTitle}>Không tìm thấy đơn hàng.</div>;
   }
 
-  // === BẮT ĐẦU SỬA LỖI ===
-  // Ép kiểu tất cả về Number (Số)
+  // (Phần tính toán numTotal, subtotal giữ nguyên)
   const numTotal = Number(order.total);
   const numDiscount = Number(order.discount_amount || 0);
   const numCoinDiscount = Number(order.coin_discount_amount || 0);
-
-  // Tính toán Tạm tính (Subtotal)
   const subtotal = numTotal + numDiscount + numCoinDiscount;
-  // === KẾT THÚC SỬA LỖI ===
 
   return (
     <div>
@@ -141,6 +155,7 @@ export default function AdminOrderDetailPage() {
         <FiArrowLeft /> Quay lại danh sách
       </Link>
 
+      {/* (Toàn bộ phần JSX bên dưới giữ nguyên y hệt) */}
       <div className={detailStyles.header}>
         <h1 className={styles.pageTitle}>
           Chi tiết Đơn hàng: {order.order_code}
@@ -156,7 +171,6 @@ export default function AdminOrderDetailPage() {
                 {opt.label}
               </option>
             ))}
-            {/* Thêm các status đặc biệt nếu cần */}
             {order.status === "pending_recipient" && (
               <option value="pending_recipient">Chờ nhận quà</option>
             )}
@@ -175,9 +189,7 @@ export default function AdminOrderDetailPage() {
       </div>
 
       <div className={detailStyles.layoutGrid}>
-        {/* CỘT BÊN TRÁI: SẢN PHẨM & THANH TOÁN */}
         <div className={detailStyles.leftColumn}>
-          {/* Box Sản phẩm */}
           <div className={detailStyles.card}>
             <h3 className={detailStyles.cardTitle}>
               <FiPackage /> Sản phẩm
@@ -209,11 +221,9 @@ export default function AdminOrderDetailPage() {
             <div className={detailStyles.costSummary}>
               <div className={detailStyles.costRow}>
                 <span>Tạm tính</span>
-                {/* SỬA Ở ĐÂY */}
                 <span>{subtotal.toLocaleString("vi-VN")} ₫</span>
               </div>
 
-              {/* SỬA Ở ĐÂY (dùng numDiscount) */}
               {numDiscount > 0 && (
                 <div
                   className={`${detailStyles.costRow} ${detailStyles.discount}`}
@@ -222,7 +232,6 @@ export default function AdminOrderDetailPage() {
                   <span>- {numDiscount.toLocaleString("vi-VN")} ₫</span>
                 </div>
               )}
-              {/* SỬA Ở ĐÂY (dùng numCoinDiscount) */}
               {numCoinDiscount > 0 && (
                 <div
                   className={`${detailStyles.costRow} ${detailStyles.discount}`}
@@ -235,13 +244,11 @@ export default function AdminOrderDetailPage() {
                 className={`${detailStyles.costRow} ${detailStyles.grandTotal}`}
               >
                 <span>Tổng cộng</span>
-                {/* SỬA Ở ĐÂY (dùng numTotal) */}
                 <span>{numTotal.toLocaleString("vi-VN")} ₫</span>
               </div>
             </div>
           </div>
 
-          {/* Box Thanh toán */}
           <div className={detailStyles.card}>
             <h3 className={detailStyles.cardTitle}>
               <FiDollarSign /> Thanh toán
@@ -255,7 +262,6 @@ export default function AdminOrderDetailPage() {
           </div>
         </div>
 
-        {/* CỘT BÊN PHẢI: KHÁCH HÀNG & GIAO HÀNG (Giữ nguyên) */}
         <div className={detailStyles.rightColumn}>
           {order.is_digital_gift ? (
             <div className={detailStyles.card}>

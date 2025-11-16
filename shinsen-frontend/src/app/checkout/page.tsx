@@ -14,7 +14,7 @@ import {
   FiTag,
   FiDatabase,
   FiX,
-  FiGift, // <-- Thêm icon Quà
+  FiGift,
 } from "react-icons/fi";
 import QRCode from "react-qr-code";
 import styles from "./CheckoutPage.module.css";
@@ -51,6 +51,9 @@ export default function CheckoutPage() {
   const { token, user } = useAuth();
   const router = useRouter();
 
+  // === SỬA 1: THÊM BIẾN API_URL ===
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
   // State cho địa chỉ
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [districts, setDistricts] = useState<District[]>([]);
@@ -77,14 +80,13 @@ export default function CheckoutPage() {
   );
   const [useCoins, setUseCoins] = useState(false);
 
-  // === SỬA 1: THÊM STATE CHO QUÀ TẶNG ===
+  // State cho Quà tặng
   const [isDigitalGift, setIsDigitalGift] = useState(false);
   const [recipientInfo, setRecipientInfo] = useState({
     recipientName: "",
     recipientEmail: "",
     recipientMessage: "",
   });
-  // =======================================
 
   // State cho Đơn hàng & Lỗi
   const [promoError, setPromoError] = useState<string | null>(null);
@@ -99,17 +101,22 @@ export default function CheckoutPage() {
 
   // Lấy danh sách voucher của user
   useEffect(() => {
-    if (token) {
-      fetch("/api/vouchers/my", {
+    // === SỬA 2: THÊM API_URL VÀO FETCH ===
+    if (token && API_URL) {
+      fetch(`${API_URL}/api/vouchers/my`, {
+        // <--- SỬA Ở ĐÂY
         headers: { Authorization: `Bearer ${token}` },
       })
-        .then((res) => res.json())
+        .then((res) => {
+          if (!res.ok) throw new Error("Lỗi tải voucher");
+          return res.json();
+        })
         .then((data) => setMyVouchers(data))
         .catch((err) => console.error("Không thể tải voucher của bạn:", err));
     }
-  }, [token]);
+  }, [token, API_URL]); // <--- Thêm API_URL
 
-  // Lấy danh sách Tỉnh/Thành
+  // Lấy danh sách Tỉnh/Thành (Dùng API ngoài, không cần sửa)
   useEffect(() => {
     fetch("https://provinces.open-api.vn/api/p/")
       .then((res) => res.json())
@@ -162,7 +169,7 @@ export default function CheckoutPage() {
     setShippingInfo(newShippingInfo);
   };
 
-  // === SỬA 2: HÀM MỚI CHO FORM QUÀ TẶNG ===
+  // Hàm cho form Quà tặng
   const handleRecipientChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -171,14 +178,13 @@ export default function CheckoutPage() {
       [e.target.name]: e.target.value,
     });
   };
-  // =======================================
 
-  // Tính toán lại tổng tiền (Logic giữ nguyên)
+  // Tính toán lại tổng tiền
   const { coinDiscount, finalTotal, maxCoinsAllowed } = useMemo(() => {
     const userCoins = user?.coins || 0;
     const originalTotal = cartTotal;
     const totalAfterVoucher = originalTotal - voucherDiscount;
-    const calculatedMaxCoins = Math.floor(originalTotal * 0.5);
+    const calculatedMaxCoins = Math.floor(originalTotal * 0.5); // 50%
     const coinsToUse = Math.min(
       userCoins,
       calculatedMaxCoins,
@@ -193,13 +199,15 @@ export default function CheckoutPage() {
     };
   }, [cartTotal, voucherDiscount, useCoins, user]);
 
-  // Hàm Áp dụng Voucher (Logic giữ nguyên)
+  // Hàm Áp dụng Voucher
   const handleApplyVoucher = async (code: string) => {
-    if (!code) return;
+    // === SỬA 3: THÊM API_URL VÀO FETCH ===
+    if (!code || !API_URL) return;
     setPromoError(null);
     setPromoSuccess(null);
     try {
-      const res = await fetch("/api/orders/apply-voucher", {
+      const res = await fetch(`${API_URL}/api/orders/apply-voucher`, {
+        // <--- SỬA Ở ĐÂY
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -222,12 +230,12 @@ export default function CheckoutPage() {
     }
   };
 
-  // Hàm Bật/Tắt Xu (Logic giữ nguyên)
+  // Hàm Bật/Tắt Xu
   const handleToggleCoins = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUseCoins(e.target.checked);
   };
 
-  // --- HÀM ĐẶT HÀNG (ĐÃ CẬP NHẬT) ---
+  // --- HÀM ĐẶT HÀNG ---
   const validateShippingInfo = () => {
     const { name, phone, address, ward, district, province } = shippingInfo;
     return !(!name || !phone || !address || !ward || !district || !province);
@@ -237,7 +245,7 @@ export default function CheckoutPage() {
     e.preventDefault();
     setError(null);
 
-    // === SỬA 3: CẬP NHẬT LOGIC VALIDATE ===
+    // Validate (logic quà tặng)
     if (!isDigitalGift && !validateShippingInfo()) {
       setError("Vui lòng điền đầy đủ thông tin giao hàng.");
       return;
@@ -249,37 +257,41 @@ export default function CheckoutPage() {
       setError("Vui lòng nhập Tên và Email của người nhận quà.");
       return;
     }
-    // ======================================
+    // === SỬA 4: THÊM CHECK API_URL ===
+    if (!API_URL) {
+      setError("Lỗi cấu hình: Không thể kết nối tới máy chủ.");
+      return;
+    }
 
     setIsLoading(true);
     try {
-      // === SỬA 4: CẬP NHẬT PAYLOAD GỬI LÊN ===
+      // Build payload
       const payload = {
         cartItems,
-        total: finalTotal, // Gửi TỔNG TIỀN CUỐI CÙNG
+        total: finalTotal,
         paymentMethod: selectedPayment,
         voucherCode: appliedVoucherCode,
         discountAmount: voucherDiscount,
         coinsUsed: useCoins ? coinDiscount : 0,
         coinDiscountAmount: coinDiscount,
-        isDigitalGift: isDigitalGift, // Báo cho backend đây là quà
+        isDigitalGift: isDigitalGift,
       };
 
       if (isDigitalGift) {
-        // Gửi thông tin người nhận
         Object.assign(payload, recipientInfo);
       } else {
-        // Gửi thông tin giao hàng
         Object.assign(payload, { shippingInfo });
       }
 
-      const response = await fetch("/api/orders", {
+      // === SỬA 5: THÊM API_URL VÀO FETCH ===
+      const response = await fetch(`${API_URL}/api/orders`, {
+        // <--- SỬA Ở ĐÂY
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(payload), // Gửi payload đã xử lý
+        body: JSON.stringify(payload),
       });
       // ======================================
 
@@ -298,8 +310,8 @@ export default function CheckoutPage() {
       } else if (data.payUrl) {
         window.location.href = data.payUrl;
       } else {
-        // Nếu là quà tặng, cũng chuyển hướng đến trang thành công
-        router.push("/order-result");
+        // COD hoặc Quà Tặng (không cần thanh toán ngay)
+        router.push("/order-result?status=success");
       }
     } catch (err: any) {
       setError(err.message);
@@ -308,13 +320,13 @@ export default function CheckoutPage() {
     }
   };
 
-  // Màn hình QR (Giữ nguyên)
+  // Màn hình QR
   if (orderData) {
     return (
       <div className={styles.pageWrapper}>
         <div className={styles.qrSuccessScreen}>
           <h3>Đặt hàng thành công!</h3>
-          <p>Vui lòng quét mã VietQR...</p>
+          <p>Vui lòng quét mã VietQR bên dưới để hoàn tất thanh toán.</p>
           <div className={styles.qrContainer}>
             <QRCode
               value={orderData.vietQRString}
@@ -331,7 +343,7 @@ export default function CheckoutPage() {
             </div>
           </div>
           <p className={styles.bankNote}>
-            Sau khi chuyển khoản, hệ thống sẽ tự động xác nhận.
+            Sau khi chuyển khoản, hệ thống sẽ tự động xác nhận đơn hàng của bạn.
           </p>
           <Link href="/profile/orders" className={styles.viewOrderButton}>
             Xem lịch sử đơn hàng
@@ -341,7 +353,7 @@ export default function CheckoutPage() {
     );
   }
 
-  // Lấy văn bản cho nút bấm (Giữ nguyên)
+  // Lấy văn bản cho nút bấm
   const getButtonText = () => {
     if (isLoading) return "ĐANG XỬ LÝ...";
     if (selectedPayment === "momo") return "TIẾP TỤC VỚI MOMO";
@@ -353,7 +365,7 @@ export default function CheckoutPage() {
   // --- GIAO DIỆN CHECKOUT CHÍNH ---
   return (
     <>
-      {/* === MODAL VOUCHER (Giữ nguyên) === */}
+      {/* === MODAL VOUCHER === */}
       {isVoucherModalOpen && (
         <div
           className={styles.modalOverlay}
@@ -400,7 +412,7 @@ export default function CheckoutPage() {
                     </div>
                   ))
               ) : (
-                <p>Bạn không có voucher nào.</p>
+                <p>Bạn không có voucher nào hợp lệ.</p>
               )}
             </div>
           </div>
@@ -415,7 +427,7 @@ export default function CheckoutPage() {
               Decharmix Checkout
             </Link>
             <form onSubmit={handlePlaceOrder}>
-              {/* === SỬA 5: THÊM CHECKBOX QUÀ TẶNG === */}
+              {/* === CHECKBOX QUÀ TẶNG === */}
               <div className={styles.section}>
                 <label
                   className={`${styles.giftToggle} ${
@@ -431,7 +443,6 @@ export default function CheckoutPage() {
                   <span>(Gửi link cho người nhận tự điền địa chỉ)</span>
                 </label>
               </div>
-              {/* ================================== */}
 
               {/* --- Thông tin giao hàng (Đơn thường) --- */}
               {!isDigitalGift && (
@@ -494,7 +505,7 @@ export default function CheckoutPage() {
                       required
                       onChange={handleInputChange}
                       disabled={!wards.length}
-                      value={shippingInfo.ward}
+                      value={shippingInfo.ward} // Giá trị là Tên
                     >
                       <option value="">-- Chọn Phường/Xã --</option>
                       {wards.map((w) => (
@@ -515,7 +526,7 @@ export default function CheckoutPage() {
                 </div>
               )}
 
-              {/* === SỬA 6: FORM QUÀ TẶNG (Đơn quà) === */}
+              {/* === FORM QUÀ TẶNG (Đơn quà) === */}
               {isDigitalGift && (
                 <div className={styles.section}>
                   <h3 className={styles.sectionTitle}>
@@ -545,7 +556,6 @@ export default function CheckoutPage() {
                   </div>
                 </div>
               )}
-              {/* ================================== */}
 
               {/* --- Phương thức thanh toán --- */}
               <div className={styles.section}>
@@ -649,7 +659,6 @@ export default function CheckoutPage() {
 
           {/* === CỘT BÊN PHẢI (TÓM TẮT ĐƠN HÀNG) === */}
           <div className={styles.rightColumn}>
-            {/* --- Khung Tóm Tắt Sản Phẩm (Giữ nguyên) --- */}
             <div className={styles.summaryCard}>
               <h3 className={styles.sectionTitle}>
                 <FiPackage /> Tóm tắt đơn hàng ({itemCount})
@@ -679,7 +688,7 @@ export default function CheckoutPage() {
                 ))}
               </div>
 
-              {/* --- KHUNG KHUYẾN MÃI (Giữ nguyên) --- */}
+              {/* --- KHUNG KHUYẾN MÃI --- */}
               <div className={styles.promoSection}>
                 <h3 className={styles.sectionTitle}>
                   <FiTag /> Khuyến mãi
@@ -729,7 +738,7 @@ export default function CheckoutPage() {
                 )}
               </div>
 
-              {/* --- KHUNG TỔNG TIỀN (Giữ nguyên) --- */}
+              {/* --- KHUNG TỔNG TIỀN --- */}
               <div className={styles.costSummary}>
                 <div className={styles.costRow}>
                   <span>Tạm tính</span>

@@ -8,8 +8,9 @@ import React, {
   ReactNode,
 } from "react";
 import { jwtDecode } from "jwt-decode";
+import { toast } from "react-hot-toast"; // (Thêm toast để thông báo)
 
-// Interface User (Đã đầy đủ 7 vé + role - theo file của bạn)
+// Interface User (Lấy từ file của bạn, đã đủ 7 vé)
 interface User {
   id: string;
   email: string;
@@ -24,7 +25,7 @@ interface User {
   memory_plays: number;
   whac_plays: number;
   jump_plays: number;
-  claw_plays: number; // (Bạn đã thêm lại 'claw_plays' ở file [135])
+  claw_plays: number;
   slice_plays: number;
 }
 
@@ -41,16 +42,25 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Lấy URL Backend từ file .env.local
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [token, setToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true); // State theo dõi việc tải
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Hàm lấy profile (dùng chung)
+  // === SỬA LỖI 1: SỬA HÀM FETCH PROFILE ===
   const fetchUserProfile = async (currentToken: string) => {
+    if (!API_URL) {
+      console.error("Lỗi: NEXT_PUBLIC_API_URL chưa được cấu hình.");
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const response = await fetch("/api/users/profile", {
+      const response = await fetch(`${API_URL}/api/users/profile`, {
         headers: { Authorization: `Bearer ${currentToken}` },
       });
       if (!response.ok) throw new Error("Phiên đăng nhập không hợp lệ.");
@@ -66,67 +76,83 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setToken(null);
       setIsAuthenticated(false);
     } finally {
-      setIsLoading(false); // Báo là đã tải xong (dù thành công hay thất bại)
+      setIsLoading(false);
     }
   };
+  // ======================================
 
   useEffect(() => {
     const initializeAuth = async () => {
       const storedToken = localStorage.getItem("decharmix_token");
       if (storedToken) {
         try {
-          jwtDecode(storedToken); // Kiểm tra token hợp lệ
+          jwtDecode(storedToken);
           await fetchUserProfile(storedToken);
         } catch (error) {
-          // Token hỏng hoặc hết hạn
           localStorage.removeItem("decharmix_token");
           setUser(null);
           setToken(null);
           setIsAuthenticated(false);
-          setIsLoading(false); // Báo tải xong
+          setIsLoading(false);
         }
       } else {
-        setIsLoading(false); // Không có token, tải xong
+        setIsLoading(false);
       }
     };
     initializeAuth();
   }, []);
 
-  // === ĐÃ SỬA HÀM LOGIN (Tự động chuyển hướng) ===
+  // (Hàm Login giữ nguyên)
   const login = (jwtToken: string, userData: User) => {
     localStorage.setItem("decharmix_token", jwtToken);
     setUser(userData);
     setToken(jwtToken);
     setIsAuthenticated(true);
 
-    // Tự động phát hiện vai trò và chuyển hướng
     if (userData.role === "admin") {
       window.location.href = "/dashboard";
     } else {
+      // (Thêm toast chào mừng)
+      toast.success(
+        `Chào mừng trở lại, ${userData.full_name || userData.name}!`
+      );
       window.location.href = "/";
     }
   };
-  // =============================================
 
+  // (Hàm Logout giữ nguyên)
   const logout = () => {
     localStorage.removeItem("decharmix_token");
     setUser(null);
     setToken(null);
     setIsAuthenticated(false);
-    window.location.href = "/login"; // Chuyển hướng về login
+    window.location.href = "/login";
   };
 
+  // (Hàm updateUser giữ nguyên)
   const updateUser = (newUserData: Partial<User>) => {
     setUser((prevUser) => (prevUser ? { ...prevUser, ...newUserData } : null));
   };
 
+  // === SỬA LỖI 2: SỬA HÀM REFRESH STATS ===
   const refreshUserStats = async () => {
     const currentToken = localStorage.getItem("decharmix_token");
-    if (currentToken) {
+    if (currentToken && API_URL) {
       console.log("Đang làm mới thông tin User (Tất cả vé)...");
-      await fetchUserProfile(currentToken);
+      try {
+        const response = await fetch(`${API_URL}/api/users/profile`, {
+          headers: { Authorization: `Bearer ${currentToken}` },
+        });
+        if (!response.ok) throw new Error("Phiên đăng nhập không hợp lệ.");
+        const freshUserData = await response.json();
+        setUser(freshUserData); // Cập nhật lại user
+      } catch (error) {
+        console.error("Lỗi làm mới:", error);
+        logout(); // Đăng xuất nếu lỗi
+      }
     }
   };
+  // ======================================
 
   return (
     <AuthContext.Provider
@@ -134,7 +160,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         isAuthenticated,
         user,
         token,
-        isLoading, // Thêm isLoading vào value
+        isLoading,
         login,
         logout,
         updateUser,

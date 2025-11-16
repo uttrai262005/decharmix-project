@@ -7,7 +7,7 @@ import { FiHeart, FiPackage, FiAward, FiArrowRight } from "react-icons/fi";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination, EffectFade } from "swiper/modules";
-
+import { useAuth } from "@/contexts/AuthContext";
 // Import CSS Module mới
 import styles from "./Home.module.css";
 
@@ -15,7 +15,7 @@ import styles from "./Home.module.css";
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/effect-fade";
-
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
 // --- Định nghĩa kiểu dữ liệu (Interfaces) ---
 interface Product {
   id: number;
@@ -155,6 +155,8 @@ const CountdownTimer = ({ endDate }: { endDate: Date }) => {
 
 // --- COMPONENT CHÍNH TRANG CHỦ ---
 export default function HomePage() {
+  const { isAuthenticated, token } = useAuth();
+  const [forYouProducts, setForYouProducts] = useState<Product[]>([]);
   // === DỮ LIỆU ĐỘNG TỪ API ===
   const [newProducts, setNewProducts] = useState<Product[]>([]);
   const [bestSellers, setBestSellers] = useState<Product[]>([]);
@@ -245,36 +247,52 @@ export default function HomePage() {
 
   // === GỌI API KHI TẢI TRANG ===
   useEffect(() => {
-    const fetchHomeData = async () => {
+    const fetchPublicData = async () => {
       try {
         setIsLoading(true);
-        // Chạy 4 API song song để tải nhanh hơn
+        // (Chạy API công khai song song)
         const [newRes, bestRes, dealRes, blogRes] = await Promise.all([
-          fetch("/api/products?filter=new&limit=4"),
-          fetch("/api/products?filter=bestseller&limit=4"), // API Bán chạy
-          fetch("/api/products/deal-of-the-day"), // API Deal hot
-          fetch("/api/blog?limit=3"), // API Blog
+          fetch(`${API_URL}/api/products?filter=new&limit=4`),
+          fetch(`${API_URL}/api/products?filter=bestseller&limit=4`),
+          fetch(`${API_URL}/api/products/deal-of-the-day`),
+          fetch(`${API_URL}/api/blog?limit=3`),
         ]);
 
-        if (newRes.ok) {
-          const data = await newRes.json();
-          setNewProducts(data.products || []); // Lấy data.products
-        }
-        if (bestRes.ok) {
-          const data = await bestRes.json();
-          setBestSellers(data.products || []); // Lấy data.products
-        }
+        if (newRes.ok) setNewProducts((await newRes.json()).products || []);
+        if (bestRes.ok) setBestSellers((await bestRes.json()).products || []);
         if (dealRes.ok) setDealProduct(await dealRes.json());
         if (blogRes.ok) setBlogPosts(await blogRes.json());
       } catch (error) {
-        console.error("Lỗi khi tải dữ liệu trang chủ:", error);
+        console.error("Lỗi khi tải dữ liệu trang chủ (công khai):", error);
       } finally {
         setIsLoading(false);
       }
     };
+    fetchPublicData();
+  }, []); // (Chỉ chạy 1 lần)
 
-    fetchHomeData();
-  }, []);
+  // (useEffect 2: Tải dữ liệu AI "FOR YOU" nếu đã đăng nhập)
+  useEffect(() => {
+    const fetchForYouData = async () => {
+      // (Chỉ chạy nếu user đã đăng nhập VÀ có token)
+      if (isAuthenticated && token) {
+        try {
+          const res = await fetch(`${API_URL}/api/products/for-you`, {
+            headers: {
+              Authorization: `Bearer ${token}`, // (Gửi token xác thực)
+            },
+          });
+          if (res.ok) {
+            const data = await res.json();
+            setForYouProducts(data || []);
+          }
+        } catch (error) {
+          console.error("Lỗi khi tải gợi ý 'For You':", error);
+        }
+      }
+    };
+    fetchForYouData();
+  }, [isAuthenticated, token]); // (Chạy lại khi trạng thái đăng nhập thay đổi)
 
   return (
     <div className={styles.pageWrapper}>
@@ -482,6 +500,18 @@ export default function HomePage() {
           </div>
         </section>
         {/* =========================================== */}
+        {isAuthenticated && forYouProducts.length > 0 && (
+          <section
+            className={`${styles.container} ${styles.section} ${styles.bgPink}`}
+          >
+            <h2 className={styles.sectionTitle}>✨ Dành Riêng Cho Bạn</h2>
+            <div className={styles.productGrid}>
+              {forYouProducts.map((product, i) => (
+                <ProductCard key={product.id} product={product} index={i} />
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* ===== 6. SẢN PHẨM MỚI VỀ ===== */}
         <section className={`${styles.container} ${styles.section}`}>

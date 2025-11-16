@@ -1,15 +1,20 @@
 const pool = require("../config/db");
+const tf = require("@tensorflow/tfjs");
+const mobilenet = require("@tensorflow-models/mobilenet");
+const fs = require("fs");
+const jpeg = require("jpeg-js");
+const { PNG } = require("pngjs");
 
-// @desc    Lấy tất cả sản phẩm (ĐÃ SỬA LỖI - Đã thêm filter, limit, search, category)
+// @desc    Lấy tất cả sản phẩm ()
 const getProducts = async (req, res) => {
   try {
-    // === SỬA 1: Thêm 'tag', 'page', 'limit' (với giá trị mặc định) ===
     const { category, filter, limit = 999, page = 1, search, tag } = req.query;
 
     let queryParams = []; // Chứa các giá trị cho SQL
     let query = `
       SELECT 
         p.*, 
+        p.sentiment_summary,
         p.id as product_id, -- Đảm bảo luôn có product_id
         COALESCE(avg_reviews.avg_rating, 0) AS average_rating, 
         COALESCE(avg_reviews.review_count, 0) AS review_count
@@ -121,6 +126,7 @@ const getProductById = async (req, res) => {
     const query = `
       SELECT 
         p.*, 
+        p.sentiment_summary,
         COALESCE(avg_reviews.avg_rating, 0) AS average_rating, 
         COALESCE(avg_reviews.review_count, 0) AS review_count
       FROM 
@@ -330,6 +336,257 @@ const deleteProduct = async (req, res) => {
       .json({ error: "Lỗi server (Có thể sản phẩm dính khóa ngoại)" });
   }
 };
+const getRelatedProducts = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // 1. Lấy thông tin (category và tags) của sản phẩm đang xem
+    const productRes = await pool.query(
+      "SELECT category, tags FROM products WHERE id = $1",
+      [id]
+    );
+    if (productRes.rows.length === 0) {
+      return res.status(404).json({ error: "Không tìm thấy sản phẩm" });
+    }
+
+    const { category, tags } = productRes.rows[0];
+
+    // 2. Tạo câu lệnh SQL để tìm sản phẩm
+    // (Tìm 5 sản phẩm khác (NOT id) có CÙNG category HOẶC CÙNG 1 tag)
+    const query = `
+      SELECT * FROM products
+      WHERE 
+        id != $1 AND (
+          category = $2 OR 
+          tags && $3::text[] 
+        )
+      LIMIT 5;
+    `;
+
+    const relatedRes = await pool.query(query, [id, category, tags || []]);
+
+    res.json(relatedRes.rows);
+  } catch (error) {
+    console.error("Lỗi khi lấy sản phẩm liên quan:", error.message);
+    res.status(500).json({ error: "Lỗi server" });
+  }
+};
+const getAlsoBoughtProducts = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const query = `
+      WITH orders_with_product AS (
+        -- 1. Tìm đơn hàng chứa sản phẩm A
+        SELECT order_id 
+        FROM order_items 
+        WHERE product_id = $1
+      ),
+      also_bought_products AS (
+        -- 2. Lấy các sản phẩm khác cũng trong đơn hàng đó
+        SELECT product_id AS also_bought_product_id
+        FROM order_items
+        WHERE order_id IN (SELECT order_id FROM orders_with_product)
+          AND product_id != $1
+      ),
+      top_bought AS (
+         -- 3. Đếm và xếp hạng
+        SELECT 
+          also_bought_product_id, 
+          COUNT(*) AS purchase_count
+        FROM also_bought_products
+        GROUP BY also_bought_product_id
+        ORDER BY purchase_count DESC
+        LIMIT 5
+      )
+      -- 4. Lấy thông tin sản phẩm
+      SELECT 
+        p.*, 
+        tb.purchase_count
+      FROM products p
+      JOIN top_bought tb ON p.id = tb.also_bought_product_id
+      ORDER BY tb.purchase_count DESC;
+    `;
+
+    const { rows } = await pool.query(query, [id]);
+    res.json(rows);
+  } catch (error) {
+    console.error("Lỗi khi lấy sản phẩm mua cùng:", error.message);
+    res.status(500).json({ error: "Lỗi server" });
+  }
+};
+let model; // (Giữ mô hình AI)
+
+// === CÁC HÀM HELPER CHO AI ===
+
+// HÀM 1: HÀM TẢI ẢNH (Bằng JS, từ file tạm)
+async function loadImage(filePath) {
+  try {
+    const buffer = fs.readFileSync(filePath);
+    let pixelData;
+    let width, height;
+
+    if (
+      buffer[0] === 137 &&
+      buffer[1] === 80 &&
+      buffer[2] === 78 &&
+      buffer[3] === 71
+    ) {
+      const pngData = PNG.sync.read(buffer);
+      pixelData = pngData.data;
+      width = pngData.width;
+      height = pngData.height;
+    } else if (buffer[0] === 255 && buffer[1] === 216 && buffer[2] === 255) {
+      const jpegData = jpeg.decode(buffer, { useTArray: true });
+      pixelData = jpegData.data;
+      width = jpegData.width;
+      height = jpegData.height;
+    } else {
+      throw new Error("Không nhận dạng được định dạng ảnh.");
+    }
+
+    const numPixels = width * height;
+    const channels = 3;
+    const rgbData = new Uint8Array(numPixels * channels);
+    for (let i = 0; i < numPixels; i++) {
+      rgbData[i * channels] = pixelData[i * 4]; // R
+      rgbData[i * channels + 1] = pixelData[i * 4 + 1]; // G
+      rgbData[i * channels + 2] = pixelData[i * 4 + 2]; // B
+    }
+    const tensor = tf.tensor3d(rgbData, [height, width, 3], "int32");
+    return tensor.resizeNearestNeighbor([224, 224]).toFloat().expandDims();
+  } catch (error) {
+    console.error(
+      `[Lỗi] Không thể đọc file ảnh (JS): ${filePath}`,
+      error.message
+    );
+    return null;
+  }
+}
+
+// HÀM 2: HÀM LẤY VECTOR (AI "nhìn" ảnh)
+async function getVector(imageTensor) {
+  try {
+    // 2. XÓA LOGIC TẢI AI Ở ĐÂY
+    // (Giả định rằng 'model' đã được tải lúc server khởi động)
+    const vector = model.infer(imageTensor, true).arraySync()[0];
+    return vector;
+  } catch (error) {
+    console.error(
+      "  [Lỗi] AI không thể suy luận (hoặc model chưa được tải):",
+      error.message
+    );
+    return null;
+  }
+}
+
+// HÀM 3: HÀM KHỞI ĐỘNG AI (MỚI)
+// (Hàm này sẽ được gọi bởi server.js)
+const initMobileNetModel = async () => {
+  if (model) return; // (Nếu đã tải rồi thì thôi)
+  try {
+    console.log("🤖 Đang tải mô hình AI (MobileNet) vào bộ nhớ...");
+    model = await mobilenet.load();
+    console.log("✅ Tải mô hình AI (MobileNet) thành công!");
+  } catch (error) {
+    console.error("--- LỖI NGHIÊM TRỌNG: KHÔNG THỂ TẢI MÔ HÌNH AI ---", error);
+  }
+};
+
+// HÀM 4: API VISUAL SEARCH (Đã nâng cấp pgvector)
+const visualSearch = async (req, res) => {
+  try {
+    if (!model) {
+      // (Phòng trường hợp model chưa kịp tải)
+      return res
+        .status(503)
+        .json({ error: "AI đang khởi động, vui lòng thử lại sau 10 giây." });
+    }
+    if (!req.file) {
+      return res.status(400).json({ error: "Không tìm thấy file ảnh." });
+    }
+    const filePath = req.file.path;
+
+    // 1. "Cho" AI "nhìn" ảnh user upload
+    const imageTensor = await loadImage(filePath);
+    if (!imageTensor) {
+      return res.status(400).json({ error: "Không thể đọc file ảnh." });
+    }
+    const userVector = await getVector(imageTensor);
+    tf.dispose(imageTensor);
+
+    // 2. Dùng SQL (pgvector)
+    const userVectorString = JSON.stringify(userVector);
+    const query = `
+      SELECT 
+        id, name, image_url, price, discount_price, category,
+        (image_vector <=> $1) AS similarity_distance
+      FROM products
+      WHERE image_vector IS NOT NULL
+      ORDER BY similarity_distance ASC 
+      LIMIT 6;
+    `;
+    const { rows: products } = await pool.query(query, [userVectorString]);
+
+    // 3. Chuyển đổi kết quả
+    const results = products.map((p) => ({
+      similarity: 1 - p.similarity_distance,
+      product: {
+        id: p.id,
+        name: p.name,
+        image_url: p.image_url,
+        price: p.price,
+        discount_price: p.discount_price,
+        category: p.category,
+      },
+    }));
+
+    // 4. Xóa file ảnh tạm
+    fs.unlinkSync(filePath);
+    res.json(results);
+  } catch (error) {
+    console.error("Lỗi Visual Search API (pgvector):", error.message);
+    res.status(500).json({ error: "Lỗi server" });
+  }
+};
+const getForYouRecommendations = async (req, res) => {
+  const userId = req.user.id; // (Lấy từ middleware 'protect')
+
+  try {
+    // 1. Lấy "Vector Khẩu vị" của user
+    const { rows } = await pool.query(
+      "SELECT taste_vector FROM users WHERE id = $1",
+      [userId]
+    );
+
+    const userVectorString = rows[0]?.taste_vector;
+
+    // (Nếu user chưa có "khẩu vị", trả về sản phẩm mới nhất)
+    if (!userVectorString) {
+      const { rows: newProducts } = await pool.query(
+        "SELECT * FROM products ORDER BY created_at DESC LIMIT 10"
+      );
+      return res.json(newProducts);
+    }
+
+    // 2. Dùng pgvector để tìm sản phẩm GẦN NHẤT với "khẩu vị"
+    const query = `
+      SELECT 
+        id, name, image_url, price, discount_price, category,
+        (image_vector <=> $1) AS similarity
+      FROM products
+      WHERE image_vector IS NOT NULL
+      ORDER BY similarity ASC 
+      LIMIT 10;
+    `;
+    const { rows: products } = await pool.query(query, [userVectorString]);
+
+    res.json(products);
+  } catch (error) {
+    console.error("Lỗi API 'For You':", error.message);
+    res.status(500).json({ error: "Lỗi server" });
+  }
+};
 module.exports = {
   getProducts,
   getProductById,
@@ -339,4 +596,9 @@ module.exports = {
   createProduct,
   updateProduct,
   deleteProduct,
+  getRelatedProducts,
+  getAlsoBoughtProducts,
+  visualSearch,
+  initMobileNetModel,
+  getForYouRecommendations,
 };

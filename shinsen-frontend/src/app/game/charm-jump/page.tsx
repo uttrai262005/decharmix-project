@@ -76,7 +76,7 @@ export default function CharmJumpPage() {
   useEffect(() => {
     if (user) {
       setUserCoins(user.coins);
-      fetch("/api/game/stats", {
+      fetch("/api/games/stats", {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then((res) => res.json())
@@ -251,7 +251,7 @@ export default function CharmJumpPage() {
     setApiResult(null);
 
     try {
-      const response = await fetch("/api/game/jump-play", {
+      const response = await fetch("/api/games/jump-play", {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });

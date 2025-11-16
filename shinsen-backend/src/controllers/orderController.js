@@ -655,7 +655,7 @@ const getAllOrders = async (req, res) => {
 
 // === HÀM CẬP NHẬT TRẠNG THÁI (ADMIN) (Code cũ của bạn) ===
 const updateOrderStatus = async (req, res) => {
-  const { orderId } = req.params;
+  const { id: orderId } = req.params;
   const { status } = req.body;
   const allowedStatus = [
     "Chờ xác nhận",
@@ -800,7 +800,54 @@ const getOrderById = async (req, res) => {
     res.status(500).json({ error: "Lỗi server." });
   }
 };
+async function updateUserTasteVector(userId) {
+  const client = await pool.connect();
+  try {
+    // 1. Lấy TẤT CẢ vector của các sản phẩm user NÀY đã từng mua
+    const { rows: vectors } = await client.query(
+      `
+      SELECT p.image_vector
+      FROM products p
+      JOIN order_items oi ON p.id = oi.product_id
+      JOIN orders o ON oi.order_id = o.id
+      WHERE o.user_id = $1 AND p.image_vector IS NOT NULL;
+    `,
+      [userId]
+    );
 
+    if (vectors.length === 0) return; // (Bỏ qua nếu user chưa mua gì)
+
+    // 2. Tính TÍNH TRUNG BÌNH CỘNG (Average) của tất cả vector
+    // (Đây chính là logic AI: "Vector hóa Khẩu vị")
+    const numVectors = vectors.length;
+    const avgVector = new Array(1024).fill(0);
+
+    for (const row of vectors) {
+      // (Lưu ý: pgvector trả về chuỗi '[0.1, ...]', phải Parse)
+      const vector = JSON.parse(row.image_vector);
+      for (let i = 0; i < 1024; i++) {
+        avgVector[i] += vector[i];
+      }
+    }
+
+    // (Chia trung bình)
+    for (let i = 0; i < 1024; i++) {
+      avgVector[i] = avgVector[i] / numVectors;
+    }
+
+    // 3. Lưu "Vector Khẩu vị" mới vào bảng users
+    await client.query("UPDATE users SET taste_vector = $1 WHERE id = $2", [
+      JSON.stringify(avgVector),
+      userId,
+    ]);
+
+    console.log(`[AI] Đã cập nhật "Vector Khẩu vị" cho user ${userId}`);
+  } catch (error) {
+    console.error("Lỗi cập nhật Taste Vector:", error);
+  } finally {
+    client.release();
+  }
+}
 // ======================================
 
 module.exports = {

@@ -1,49 +1,34 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Wheel } from "react-custom-roulette";
+// 1. IMPORT DYNAMIC
+import dynamic from "next/dynamic";
 import { useAuth } from "@/contexts/AuthContext";
 import styles from "./LuckyWheel.module.css";
 import { FiGift, FiDatabase } from "react-icons/fi";
+import { WheelData } from "react-custom-roulette/dist/components/Wheel/types";
 
-// Mảng giải thưởng (phải khớp 100% với backend)
-const wheelData = [
-  {
-    option: "100 Xu",
-    style: { backgroundColor: "#fff5f9", textColor: "#be5985" },
-  }, // 0
-  {
-    option: "Chúc bạn may mắn",
-    style: { backgroundColor: "#ffe2f2", textColor: "#7c596b" },
-  }, // 1
-  {
-    option: "Voucher 10K",
-    style: { backgroundColor: "#fff5f9", textColor: "#be5985" },
-  }, // 2
-  {
-    option: "+1 Lượt quay",
-    style: { backgroundColor: "#ffe2f2", textColor: "#7c596b" },
-  }, // 3
-  {
-    option: "300 Xu",
-    style: { backgroundColor: "#fff5f9", textColor: "#be5985" },
-  }, // 4
-  {
-    option: "Chúc bạn may mắn",
-    style: { backgroundColor: "#ffe2f2", textColor: "#7c596b" },
-  }, // 5
-  {
-    option: "Voucher FreeShip",
-    style: { backgroundColor: "#fff5f9", textColor: "#be5985" },
-  }, // 6
-  {
-    option: "1,000 Xu",
-    style: { backgroundColor: "#ffe2f2", textColor: "#be5985" },
-  }, // 7
+// 2. TẢI ĐỘNG COMPONENT <Wheel> VỚI SSR: FALSE
+const Wheel = dynamic(
+  () => import("react-custom-roulette").then((mod) => mod.Wheel),
+  { ssr: false }
+);
+
+// 3. Mảng này GIỜ CHỈ CÒN LƯU STYLE
+// (Bạn có thể thêm/bớt style nếu muốn, nó sẽ tự lặp lại)
+const wheelStyles = [
+  { style: { backgroundColor: "#fff5f9", textColor: "#be5985" } },
+  { style: { backgroundColor: "#ffe2f2", textColor: "#7c596b" } },
 ];
 
 export default function LuckyWheelPage() {
   const { user, token, refreshUserStats } = useAuth();
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+  // 4. TẠO STATE MỚI CHO VÒNG QUAY
+  // WheelData là type từ thư viện
+  const [wheelData, setWheelData] = useState<Partial<WheelData>[]>([]);
+  const [isLoadingWheel, setIsLoadingWheel] = useState(true);
 
   const [mustSpin, setMustSpin] = useState(false);
   const [prizeNumber, setPrizeNumber] = useState(0);
@@ -51,11 +36,43 @@ export default function LuckyWheelPage() {
   const [userCoins, setUserCoins] = useState(0);
   const [resultMessage, setResultMessage] = useState("");
 
-  // Hàm lấy stats (Lượt quay & Xu)
+  // 5. TẢI DỮ LIỆU VÒNG QUAY KHI VÀO TRANG
+  useEffect(() => {
+    const fetchWheelPrizes = async () => {
+      if (!API_URL) {
+        setResultMessage("Lỗi: Không thể tải cấu hình server.");
+        return;
+      }
+      setIsLoadingWheel(true);
+      try {
+        // Gọi API mới (đã thêm 's' -> /api/games)
+        const res = await fetch(`${API_URL}/api/games/wheel-prizes`);
+        if (!res.ok) throw new Error("Lỗi tải giải thưởng từ server");
+
+        const prizesFromDB: { name: string }[] = await res.json();
+
+        // Trộn data từ DB (name) với style (frontend)
+        const finalWheelData = prizesFromDB.map((prize, index) => ({
+          option: prize.name, // Lấy từ DB
+          style: wheelStyles[index % wheelStyles.length].style, // Lấy style từ mảng trên
+        }));
+
+        setWheelData(finalWheelData);
+      } catch (err: any) {
+        console.error("Lỗi tải vòng quay:", err);
+        setResultMessage(err.message);
+      } finally {
+        setIsLoadingWheel(false);
+      }
+    };
+    fetchWheelPrizes();
+  }, [API_URL]); // Chỉ chạy 1 lần khi API_URL sẵn sàng
+
+  // 6. Tải stats của User (giữ nguyên)
   const fetchStats = async () => {
-    if (!token) return;
+    if (!token || !API_URL) return;
     try {
-      const res = await fetch("/api/game/stats", {
+      const res = await fetch(`${API_URL}/api/games/stats`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
@@ -68,28 +85,29 @@ export default function LuckyWheelPage() {
     }
   };
 
-  // Lấy stats khi user thay đổi (ví dụ: khi refreshUserStats được gọi)
   useEffect(() => {
     if (user) {
-      setUserCoins(user.coins); // Lấy xu từ context
-      setSpinTickets(user.spin_tickets || 0); // Lấy lượt quay từ context
-      fetchStats(); // Gọi API để chắc chắn (nếu context chưa cập nhật)
+      setUserCoins(user.coins);
+      setSpinTickets(user.spin_tickets || 0);
+      fetchStats();
     }
-  }, [user, token]); // Chạy lại khi 'user' thay đổi
+  }, [user, token]);
 
-  // === SỬA LỖI 1: HÀM CLICK CHỈ ĐỂ LẤY KẾT QUẢ ===
+  // 7. Hàm Quay (giữ nguyên)
   const handleSpinClick = async () => {
     if (spinTickets <= 0) {
       setResultMessage("Bạn đã hết lượt quay.");
       return;
     }
-    if (mustSpin) return; // Đang quay
-
-    setResultMessage(""); // Xóa thông báo cũ
+    if (mustSpin) return;
+    if (!API_URL) {
+      setResultMessage("Lỗi kết nối. Vui lòng tải lại trang.");
+      return;
+    }
+    setResultMessage("");
 
     try {
-      // 1. Gọi API backend để biết trúng gì
-      const response = await fetch("/api/game/spin", {
+      const response = await fetch(`${API_URL}/api/games/spin`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -97,41 +115,46 @@ export default function LuckyWheelPage() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Quay thất bại");
 
-      // 2. Lấy kết quả từ backend (ví dụ: Index 1 - "Chúc may mắn")
       const newPrizeNumber = data.prize_index;
-
-      // 3. Bảo Vòng quay: "Hãy quay và dừng ở ô số 1"
       setPrizeNumber(newPrizeNumber);
-
-      // 4. Bắt đầu quay (frontend)
       setMustSpin(true);
-
-      // 5. Trừ lượt quay (frontend) ngay lập tức
       setSpinTickets((prev) => prev - 1);
-
-      // (Không setResultMessage hay refreshUserStats ở đây)
     } catch (error: any) {
       console.error(error);
       setResultMessage(error.message);
-      setMustSpin(false); // Cho phép quay lại nếu API lỗi
+      setMustSpin(false);
     }
   };
 
-  // === SỬA LỖI 2: HÀM NÀY CHỈ CHẠY KHI VÒNG QUAY ĐÃ DỪNG ===
+  // 8. SỬA HÀM onStopSpinning (dùng state động)
   const onStopSpinning = async () => {
-    // 1. Báo là đã quay xong
     setMustSpin(false);
 
-    // 2. Hiển thị thông báo trúng thưởng (khớp với ô đã dừng)
-    setResultMessage(
-      `Chúc mừng! Bạn đã trúng: ${wheelData[prizeNumber].option}`
-    );
+    // Lấy tên giải từ STATE (đã được tải từ DB), không hard-code nữa
+    if (wheelData.length > 0) {
+      setResultMessage(
+        `Chúc mừng! Bạn đã trúng: ${wheelData[prizeNumber].option}`
+      );
+    }
 
-    // 3. BÂY GIỜ MỚI GỌI API ĐỂ CẬP NHẬT LẠI SỐ XU (ĐÃ ĐƯỢC CỘNG Ở BACKEND)
     await refreshUserStats();
   };
-  // ====================================================
 
+  // 9. THÊM TRẠNG THÁI LOADING
+  if (isLoadingWheel) {
+    return (
+      <div className={styles.pageWrapper}>
+        <div className={styles.container}>
+          <h1 className={styles.title}>Đang tải vòng quay...</h1>
+          {resultMessage && (
+            <p className={styles.resultMessage}>{resultMessage}</p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // 10. Giao diện (đã cập nhật data={wheelData})
   return (
     <div className={styles.pageWrapper}>
       <div className={styles.container}>
@@ -158,8 +181,8 @@ export default function LuckyWheelPage() {
         <div className={styles.wheelContainer}>
           <Wheel
             mustStartSpinning={mustSpin}
-            prizeNumber={prizeNumber} // Vị trí giải do backend quyết định
-            data={wheelData}
+            prizeNumber={prizeNumber}
+            data={wheelData} // <-- SỬ DỤNG STATE ĐỘNG
             outerBorderColor={"#ffe2f2"}
             outerBorderWidth={10}
             innerBorderColor={"#ffe2f2"}
@@ -169,7 +192,7 @@ export default function LuckyWheelPage() {
             textColors={["#be5985"]}
             fontSize={14}
             fontWeight={600}
-            onStopSpinning={onStopSpinning} // <-- GỌI HÀM KHI DỪNG
+            onStopSpinning={onStopSpinning}
           />
           <button
             className={styles.spinButton}

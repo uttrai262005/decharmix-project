@@ -3,57 +3,73 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import styles from "./GiftBox.module.css";
-import { FiGift, FiDatabase, FiKey, FiLoader } from "react-icons/fi";
+import { FiGift, FiDatabase, FiKey, FiLoader, FiXCircle } from "react-icons/fi"; // Thêm FiXCircle
 import Image from "next/image";
 
-// Định nghĩa các loại giải thưởng
-type PrizeType = "coins" | "voucher" | "nothing";
+// === SỬA 1: ĐỊNH NGHĨA TYPE KHỚP VỚI BACKEND ===
+// (Backend có "xu", "voucher", "ticket", "nothing", "fail")
+type PrizeType = "xu" | "voucher" | "ticket" | "fail" | "nothing";
 
 interface PrizeResult {
   name: string;
   type: PrizeType;
-  value: number;
+  value: string; // value từ CSDL là 'text', có thể là "100" hoặc "CODE10K"
 }
 
 export default function GiftBoxPage() {
   const { user, token, refreshUserStats } = useAuth();
+
+  // === SỬA 2: THÊM API_URL ===
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
   const [boxKeys, setBoxKeys] = useState(0);
   const [userCoins, setUserCoins] = useState(0);
 
-  const [isLoading, setIsLoading] = useState(false); // Đang mở hộp...
-  const [result, setResult] = useState<PrizeResult | null>(null); // Kết quả
-  const [shakingBox, setShakingBox] = useState<number | null>(null); // Hộp đang rung
+  const [isLoading, setIsLoading] = useState(false);
+  const [result, setResult] = useState<PrizeResult | null>(null);
+  const [shakingBox, setShakingBox] = useState<number | null>(null);
 
   // Lấy số xu và chìa khóa
   useEffect(() => {
-    if (user) {
+    if (user && API_URL && token) {
+      // Thêm check API_URL
       setUserCoins(user.coins);
-      // Giả định 'user' từ context chưa có 'box_keys', ta gọi API
-      fetch("/api/game/stats", {
-        // API này trả về cả 'spin_tickets' và 'box_keys' (nếu bạn cập nhật API stats)
+
+      // === SỬA 3: THÊM API_URL VÀ .catch() ===
+      fetch(`${API_URL}/api/games/stats`, {
+        // Đã có 's' (tốt)
         headers: { Authorization: `Bearer ${token}` },
       })
-        .then((res) => res.json())
+        .then((res) => {
+          if (!res.ok) throw new Error("Lỗi tải thông tin game");
+          return res.json();
+        })
         .then((data) => {
-          // Nếu API 'stats' chưa trả về 'box_keys', bạn cần sửa API đó
-          // Tạm thời lấy từ user context (nếu bạn đã thêm 'box_keys' vào AuthContext)
-          setBoxKeys(data.box_keys || user.box_keys || 0);
+          // API stats trả về tất cả vé, bao gồm 'box_keys'
+          setBoxKeys(data.box_keys || 0);
+        })
+        .catch((err) => {
+          console.error(err.message);
+          // Có thể set 1 thông báo lỗi ở đây
         });
     }
-  }, [user, token]);
+  }, [user, token, API_URL]); // Thêm API_URL vào dependency
 
   // Hàm mở hộp
   const handleOpenBox = async (boxIndex: number) => {
-    if (boxKeys <= 0 || isLoading || result) {
-      return; // Không cho mở nếu hết chìa, đang mở, hoặc đã mở
+    // Thêm check API_URL
+    if (boxKeys <= 0 || isLoading || result || !API_URL) {
+      return;
     }
 
     setIsLoading(true);
-    setShakingBox(boxIndex); // Làm rung hộp đã chọn
+    setShakingBox(boxIndex);
     setResult(null);
 
     try {
-      const response = await fetch("/api/game/open-box", {
+      // === SỬA 4: THÊM API_URL ===
+      const response = await fetch(`${API_URL}/api/games/open-box`, {
+        // Đã có 's' (tốt)
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -64,17 +80,15 @@ export default function GiftBoxPage() {
       // Mở hộp thành công
       setResult({
         name: data.prize_name,
-        type: data.prize_type,
+        type: data.prize_type, // Backend trả về 'xu', 'voucher', 'ticket'...
         value: data.prize_value,
       });
 
-      // Cập nhật lại AuthContext (lấy xu mới và chìa khóa mới)
       await refreshUserStats();
     } catch (error: any) {
       console.error(error);
-      setResult({ name: error.message, type: "nothing", value: 0 });
+      setResult({ name: error.message, type: "fail", value: "0" });
     } finally {
-      // Dừng rung sau 1s
       setTimeout(() => {
         setIsLoading(false);
         setShakingBox(null);
@@ -86,19 +100,24 @@ export default function GiftBoxPage() {
   const playAgain = () => {
     setResult(null);
     setIsLoading(false);
-    // Lấy lại số chìa khóa (đã được refreshUserStats cập nhật)
+    // Cập nhật lại số chìa từ user context (đã được refresh)
     if (user) setBoxKeys(user.box_keys || 0);
   };
 
-  // Hiển thị Icon giải thưởng
+  // === SỬA 5: CẬP NHẬT RENDER ICON ===
   const renderPrizeIcon = (type: PrizeType) => {
-    if (type === "coins") {
+    if (type === "xu") {
       return <FiDatabase className={styles.prizeIcon} />;
     }
     if (type === "voucher") {
       return <FiGift className={styles.prizeIcon} />;
     }
-    return <span className={styles.prizeIcon}>😢</span>;
+    if (type === "ticket") {
+      // Thêm icon cho vé (ví dụ: chìa khóa)
+      return <FiKey className={styles.prizeIcon} />;
+    }
+    // "fail" hoặc "nothing"
+    return <FiXCircle className={styles.prizeIcon} />;
   };
 
   return (
@@ -139,12 +158,13 @@ export default function GiftBoxPage() {
                   ${result && shakingBox !== index ? styles.boxHidden : ""}
                 `}
               >
-                {/* Đây là hình ảnh Hộp quà (Bạn cần có ảnh này) */}
+                {/* Bạn cần có ảnh /game-gift-box.png trong thư mục /public */}
                 <Image
                   src="/game-gift-box.png"
                   alt="Hộp quà"
                   width={150}
                   height={150}
+                  priority // Ưu tiên tải ảnh
                 />
               </div>
             </div>
@@ -156,7 +176,9 @@ export default function GiftBoxPage() {
           <div className={styles.resultPopup}>
             {renderPrizeIcon(result.type)}
             <h2 className={styles.resultTitle}>
-              {result.type === "nothing" ? "Ôi!" : "Chúc Mừng!"}
+              {result.type === "fail" || result.type === "nothing"
+                ? "Ôi!"
+                : "Chúc Mừng!"}
             </h2>
             <p className={styles.resultMessage}>
               Bạn đã trúng: <strong>{result.name}</strong>

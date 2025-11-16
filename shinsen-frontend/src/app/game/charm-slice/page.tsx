@@ -69,7 +69,7 @@ export default function CharmSlicePage() {
   useEffect(() => {
     if (user) {
       setUserCoins(user.coins);
-      fetch("/api/game/stats", {
+      fetch("/api/games/stats", {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then((res) => res.json())
@@ -140,7 +140,7 @@ export default function CharmSlicePage() {
     setApiResult(null);
 
     try {
-      const response = await fetch("/api/game/slice-play", {
+      const response = await fetch("/api/games/slice-play", {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });

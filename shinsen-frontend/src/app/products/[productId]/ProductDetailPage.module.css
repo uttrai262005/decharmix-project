@@ -181,6 +181,10 @@
   background-color: #fe98bf; /* Màu hồng sáng chủ đạo */
   color: white;
   font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
   font-weight: 700;
   padding: 1rem 0;
   border-radius: 0.5rem;
@@ -408,4 +412,137 @@
 
 .subSectionTitle:first-child {
   margin-top: 0;
+}
+/* === THÊM VÀO CUỐI FILE .module.css === */
+
+/* --- Mục Gợi ý ML (Mua cùng) --- */
+.relatedSection {
+  margin-top: 3rem;
+  border-top: 1px solid var(--border-color, #ffe2f2);
+  padding-top: 2rem;
+}
+
+.relatedGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+@media (min-width: 768px) {
+  .relatedGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+@media (min-width: 1024px) {
+  .relatedGrid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+/* Thẻ sản phẩm Gợi ý (Thu nhỏ) */
+.relatedCard {
+  text-decoration: none;
+  border-radius: 8px;
+  border: 1px solid var(--border-color, #ffe2f2);
+  background-color: var(--white, #ffffff);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+.relatedCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(255, 226, 242, 0.7);
+}
+
+.relatedImageWrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background-color: var(--bg-pink, #fff5f9);
+}
+
+.relatedContent {
+  padding: 0.75rem;
+}
+
+.relatedName {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-main, #7c596b);
+  /* (Giới hạn 2 dòng) */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: 2.7em; /* 0.9rem * 1.5 (line-height) * 2 */
+  line-height: 1.5;
+}
+
+.relatedPrice {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-title, #be5985);
+  margin-top: 0.5rem;
+}
+.addToCartButton svg {
+  font-size: 1.25rem; /* (Tăng kích thước icon lên 20px) */
+  position: relative;
+  top: -1px; /* (Căn chỉnh lại 1 chút cho đẹp) */
+}
+/* === THÊM VÀO CUỐI FILE ProductDetailPage.module.css === */
+
+/* --- Hộp Tóm tắt Cảm xúc (ML) --- */
+.sentimentBox {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background-color: var(--bg-pink, #fff5f9);
+  border-radius: 8px;
+  border: 1px solid var(--border-color, #ffe2f2);
+}
+
+.sentimentTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-title, #be5985);
+  margin-bottom: 0.75rem;
+  text-align: center;
+}
+
+.sentimentBar {
+  display: flex;
+  width: 100%;
+  height: 24px;
+  border-radius: 50px;
+  overflow: hidden;
+  background-color: #fca5a5; /* Màu đỏ (tiêu cực) làm nền */
+  border: 2px solid var(--white, #ffffff);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) inset;
+}
+
+.sentimentPositive {
+  height: 100%;
+  background-color: #4ade80; /* Màu xanh lá (tích cực) */
+  color: #166534; /* Chữ xanh đậm */
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: width 0.5s ease;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.sentimentNegative {
+  height: 100%;
+  background-color: #fca5a5; /* Màu đỏ (tiêu cực) */
+  color: #991b1b; /* Chữ đỏ đậm */
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: width 0.5s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  flex-grow: 1; /* (Để thanh màu đỏ tự chiếm phần còn lại) */
 }
