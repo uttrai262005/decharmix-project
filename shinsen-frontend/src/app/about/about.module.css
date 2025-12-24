@@ -1,0 +1,304 @@
+/* --- Cấu trúc chung --- */
+.pageWrapper {
+    background-color: #f9fafb; /* bg-gray-50 */
+    padding-top: 5rem; /* pt-20 */
+    overflow-x: hidden;
+  }
+  
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+  
+  /* --- HERO SECTION (Banner) --- */
+  .heroSection {
+    position: relative;
+    height: 450px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    background-size: cover;
+    background-position: center;
+  }
+  
+  .heroOverlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Lớp phủ đen mờ */
+    z-index: 0;
+  }
+  
+  .heroContent {
+    position: relative;
+    z-index: 10;
+    padding: 0 1.5rem;
+  }
+  
+  .heroTitle {
+    font-size: 3rem; /* text-5xl */
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    color: white;
+    margin-bottom: 1rem;
+  }
+  
+  @media (min-width: 768px) {
+    .heroTitle {
+      font-size: 4.5rem; /* md:text-7xl */
+    }
+  }
+  
+  .heroSubtitle {
+    font-size: 1.25rem; /* text-xl */
+    max-width: 48rem;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+  
+  @media (min-width: 768px) {
+    .heroSubtitle {
+      font-size: 1.5rem; /* md:text-2xl */
+    }
+  }
+  
+  /* --- SECTION TITLE COMPONENT --- */
+  .titleWrapper {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 3rem; /* mb-12 */
+  }
+  
+  .titleDecoration {
+    position: absolute;
+    top: -50%;
+    left: -25%;
+    width: 150%;
+    height: 200%;
+    z-index: -10;
+    /* Đổi từ xanh nhạt sang hồng nhạt */
+    color: #fce7f3; 
+  }
+  
+  .sectionTitleText {
+    font-size: 2.25rem; /* text-4xl */
+    font-weight: 700;
+    text-align: center;
+    /* Đổi từ xanh đậm sang hồng đậm */
+    color: #9d174d; 
+  }
+  
+  /* --- DIVIDER --- */
+  .divider {
+    padding: 4rem 0; /* py-16 */
+    text-align: center;
+    display: flex;
+    justify-content: center;
+  }
+  
+  /* --- STORY SECTION --- */
+  .storySection {
+    display: grid;
+    gap: 4rem; /* gap-16 */
+    align-items: center;
+  }
+  
+  @media (min-width: 768px) {
+    .storySection {
+      grid-template-columns: 1fr 1fr; /* md:grid-cols-2 */
+    }
+  }
+  
+  .storyText {
+    font-size: 1.125rem; /* text-lg */
+    color: #4b5563; /* text-gray-600 */
+    margin-bottom: 1.5rem;
+    line-height: 1.75;
+  }
+  
+  .storyImageWrapper {
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); /* shadow-2xl */
+    max-width: 32rem;
+    margin: 0 auto;
+  }
+  
+  /* --- CORE VALUES SECTION --- */
+  .valuesSection {
+    /* Đổi nền từ xanh nhạt sang hồng phấn */
+    background-color: #fff1f2; 
+    padding: 5rem 0; /* py-20 */
+  }
+  
+  .valuesGrid {
+    display: grid;
+    gap: 2.5rem; /* gap-10 */
+  }
+  
+  @media (min-width: 768px) {
+    .valuesGrid {
+      grid-template-columns: repeat(3, 1fr); /* md:grid-cols-3 */
+    }
+  }
+  
+  .valueCard {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: all 0.3s;
+  }
+  
+  .valueCard:hover {
+    transform: translateY(-0.5rem);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .valueIconBox {
+    display: inline-flex;
+    padding: 1rem;
+    border-radius: 9999px;
+    margin-bottom: 1rem;
+    transition: background-color 0.3s;
+    
+    /* Đổi icon từ xanh sang hồng */
+    background-color: #fce7f3; 
+    color: #be185d;
+  }
+  
+  .valueCard:hover .valueIconBox {
+    background-color: #fbcfe8; /* Đậm hơn xíu khi hover */
+  }
+  
+  .valueTitle {
+    font-size: 1.5rem; /* text-2xl */
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    transition: color 0.3s;
+    
+    /* Đổi tiêu đề từ xanh sang hồng đậm */
+    color: #9d174d; 
+  }
+  
+  .valueDescription {
+    color: #4b5563;
+  }
+  
+  /* --- TIMELINE / JOURNEY SECTION --- */
+  .timelineContainer {
+    position: relative;
+    margin-left: 2rem;
+    margin-top: 1rem;
+  }
+  
+  .timelineLineBase {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 2px;
+    /* Đổi line nền từ xanh nhạt sang hồng nhạt */
+    background-color: #fbcfe8; 
+  }
+  
+  .timelineLineActive {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 2px;
+    /* Đổi line chạy từ xanh đậm sang hồng đậm */
+    background-color: #db2777; 
+  }
+  
+  .milestoneList {
+    display: flex;
+    flex-direction: column;
+    gap: 5rem; /* space-y-20 */
+  }
+  
+  .milestoneItem {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .milestoneIconBox {
+    flex-shrink: 0;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* Đổi icon mốc thời gian sang hồng */
+    background-color: #fce7f3;
+    color: #be185d;
+  }
+  
+  .milestoneYear {
+    font-size: 1.25rem;
+    font-weight: 700;
+    /* Màu năm: Hồng đậm */
+    color: #9d174d; 
+  }
+  
+  .milestoneTitle {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-top: 0.25rem;
+    /* Màu tiêu đề mốc: Hồng đậm */
+    color: #be185d; 
+  }
+  
+  .milestoneDesc {
+    margin-top: 0.5rem;
+    color: #4b5563;
+  }
+  
+  /* --- CTA SECTION (Kêu gọi hành động) --- */
+  .ctaSection {
+    /* Đổi nền từ xanh đậm sang hồng đậm Decharmix */
+    background-color: #be185d; 
+    color: white;
+    padding: 5rem 0; /* py-20 */
+    margin-top: 6rem;
+  }
+  
+  .ctaHeading {
+    font-size: 2.25rem; /* text-4xl */
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+  
+  .ctaText {
+    font-size: 1.125rem;
+    margin-bottom: 2rem;
+    max-width: 42rem;
+    margin-left: auto;
+    margin-right: auto;
+    opacity: 0.9;
+  }
+  
+  .ctaButton {
+    display: inline-block;
+    background-color: white;
+    /* Chữ nút màu hồng */
+    color: #be185d; 
+    font-weight: 700;
+    font-size: 1.125rem;
+    padding: 1rem 2.5rem;
+    border-radius: 9999px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s;
+    text-decoration: none;
+  }
+  
+  .ctaButton:hover {
+    background-color: #f3f4f6;
+  }
