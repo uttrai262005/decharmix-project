@@ -61,7 +61,7 @@ export default function RegisterPage() {
     // === 4. SỬA LẠI TOÀN BỘ GIAO DIỆN ===
     <div className={styles.pageWrapper}>
       <div className={styles.loginBox}>
-        <h1 className={styles.title}>Tạo tài khoản</h1>
+        <h1 className={styles.title}>Đăng ký Decharmix</h1>
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.inputGroup}>
