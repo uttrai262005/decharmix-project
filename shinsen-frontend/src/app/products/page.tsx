@@ -25,7 +25,7 @@ interface Product {
 }
 // ===================================
 const categories = [
-  "Tất cả",
+  "TẤT CẢ",
   "PHỤ KIỆN ĐIỆN THOẠI",
   "VÒNG TAY",
   "COMBO QUÀ TẶNG",
@@ -119,12 +119,7 @@ const ProductCard = ({ product }: { product: Product }) => {
         <div className={styles.productContent}>
           <p className={styles.productCategory}>{product.category}</p>
           <h3 className={styles.productName}>{product.name}</h3>
-          <div className={styles.ratingContainer}>
-            <StarRating rating={Number(product.average_rating) || 0} />
-            {product.review_count > 0 && (
-              <p className={styles.reviewCount}>({product.review_count})</p>
-            )}
-          </div>
+          
           <div className={styles.priceContainer}>
             {product.discount_price &&
             Number(product.discount_price) < Number(product.price) ? (
@@ -143,29 +138,40 @@ const ProductCard = ({ product }: { product: Product }) => {
             )}
           </div>
 
-          <div className={styles.actionsContainer} onClick={handleActionClick}>
-            <div className={styles.quantitySelector}>
-              <button
-                className={styles.quantityButton}
-                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-              >
-                <FiMinus />
-              </button>
-              <span className={styles.quantityDisplay}>{quantity}</span>
-              <button
-                className={styles.quantityButton}
-                onClick={() => setQuantity((q) => q + 1)}
-              >
-                <FiPlus />
-              </button>
-            </div>
-            <button
-              className={styles.addToCartButton}
-              onClick={handleAddToCart}
-            >
-              Thêm vào giỏ hàng
-            </button>
-          </div>
+{/* 3. GOM NHÓM MỚI: Rating + Số lượng nằm ngang hàng */}
+  <div className={styles.metaRow}>
+    {/* Rating nằm bên trái */}
+    <div className={styles.ratingContainer}>
+      <StarRating rating={Number(product.average_rating) || 0} />
+      {product.review_count > 0 && (
+        <p className={styles.reviewCount}>({product.review_count})</p>
+      )}
+    </div>
+
+    {/* Số lượng nằm bên phải (Đưa vào trong metaRow) */}
+    <div className={styles.quantitySelector} onClick={handleActionClick}>
+      <button
+        className={styles.quantityButton}
+        onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+      >
+        <FiMinus />
+      </button>
+      <span className={styles.quantityDisplay}>{quantity}</span>
+      <button
+        className={styles.quantityButton}
+        onClick={() => setQuantity((q) => q + 1)}
+      >
+        <FiPlus />
+      </button>
+    </div>
+  </div>
+
+  {/* 4. Nút Thêm vào giỏ (Giữ nguyên ở dưới cùng) */}
+  <div className={styles.actionsContainer} onClick={handleActionClick}>
+    <button className={styles.addToCartButton} onClick={handleAddToCart}>
+      Thêm vào giỏ hàng
+    </button>
+  </div>
         </div>
       </Link>
     </motion.div>
