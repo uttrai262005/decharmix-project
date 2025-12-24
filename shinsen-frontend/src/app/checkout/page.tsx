@@ -385,22 +385,23 @@ export default function CheckoutPage() {
               </button>
             </div>
             <div className={styles.voucherList}>
-              {myVouchers.length > 0 ? (
-                myVouchers
-                  .filter((v) => v.min_order_value <= cartTotal)
-                  .map((voucher) => (
+              {(() => {
+                // BƯỚC 1: Lọc ra những voucher hợp lệ trước
+                const validVouchers = myVouchers.filter(
+                  (v) => v.min_order_value <= cartTotal
+                );
+
+                // BƯỚC 2: Kiểm tra danh sách ĐÃ LỌC
+                if (validVouchers.length > 0) {
+                  // Trường hợp CÓ voucher hợp lệ -> Hiện danh sách
+                  return validVouchers.map((voucher) => (
                     <div key={voucher.id} className={styles.voucherCard}>
                       <div className={styles.voucherInfo}>
                         <p className={styles.voucherCode}>{voucher.code}</p>
-                        <p className={styles.voucherDesc}>
-                          {voucher.description}
-                        </p>
+                        <p className={styles.voucherDesc}>{voucher.description}</p>
                         <p className={styles.voucherMin}>
                           Đơn tối thiểu:{" "}
-                          {Number(voucher.min_order_value).toLocaleString(
-                            "vi-VN"
-                          )}{" "}
-                          ₫
+                          {Number(voucher.min_order_value).toLocaleString("vi-VN")} ₫
                         </p>
                       </div>
                       <button
@@ -410,10 +411,16 @@ export default function CheckoutPage() {
                         Áp dụng
                       </button>
                     </div>
-                  ))
-              ) : (
-                <p>Bạn không có voucher nào hợp lệ.</p>
-              )}
+                  ));
+                } else {
+                  // Trường hợp KHÔNG CÓ voucher nào hợp lệ -> Hiện thông báo
+                  return (
+                    <div className={styles.emptyVoucherState}>
+                      <p>Oops! Ví Voucher của bạn đang trống.</p>
+                    </div>
+                  );
+                }
+              })()}
             </div>
           </div>
         </div>
@@ -439,7 +446,7 @@ export default function CheckoutPage() {
                     checked={isDigitalGift}
                     onChange={() => setIsDigitalGift(!isDigitalGift)}
                   />
-                  <FiGift /> Gửi dưới dạng Quà Tặng Tức Thì
+                  <FiGift /> Gửi dưới dạng Quà tặng tức thì
                   <span>(Gửi link cho người nhận tự điền địa chỉ)</span>
                 </label>
               </div>
