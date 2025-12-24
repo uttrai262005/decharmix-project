@@ -347,10 +347,10 @@ export default function ProductDetailClient({
           <h1 className={styles.productName}>{product.name}</h1>
 
           {/* (Đánh giá sao) */}
-          <div className="flex items-center gap-2 mb-4">
+          <div className={styles.ratingWrapper}>
             <StarRating rating={averageRating} />
             {reviews.length > 0 && (
-              <span className="text-gray-500">({reviews.length} đánh giá)</span>
+              <span className={styles.reviewCountText}>({reviews.length} đánh giá)</span>
             )}
           </div>
 
