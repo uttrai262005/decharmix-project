@@ -1,0 +1,337 @@
+/* --- Cấu trúc chung --- */
+.pageWrapper {
+    background-color: #f9fafb; /* bg-gray-50: Giữ nền xám nhạt cho sạch sẽ */
+    min-height: 100vh;
+  }
+  
+  .mainContent {
+    padding-top: 5rem; /* pt-20 */
+  }
+  
+  .container {
+    max-width: 1280px; /* container */
+    margin: 0 auto;    /* mx-auto */
+    padding: 0 1.5rem; /* px-6 */
+  }
+  
+  /* --- HERO SECTION (Banner) --- */
+  .heroSection {
+    position: relative;
+    height: 450px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    overflow: hidden;
+  }
+  
+  .heroImage {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  
+  .heroImage img {
+    filter: brightness(0.5); /* Giữ độ tối để nổi bật chữ */
+  }
+  
+  .heroContent {
+    position: relative;
+    z-index: 10;
+    padding: 1.5rem;
+  }
+  
+  .heroTitle {
+    font-size: 3rem; /* text-5xl */
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 1rem;
+  }
+  
+  @media (min-width: 768px) {
+    .heroTitle {
+      font-size: 4.5rem; /* md:text-7xl */
+    }
+  }
+  
+  .heroSubtitle {
+    margin-top: 1rem;
+    font-size: 1.25rem; /* text-xl */
+    max-width: 42rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  /* --- DIVIDER --- */
+  .divider {
+    padding: 6rem 0; /* py-24 */
+    text-align: center;
+    display: flex;
+    justify-content: center;
+  }
+  
+  /* --- INFO CARDS SECTION --- */
+  .infoGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem; /* gap-8 */
+  }
+  
+  @media (min-width: 768px) {
+    .infoGrid {
+      grid-template-columns: repeat(2, 1fr); /* md:grid-cols-2 */
+    }
+  }
+  
+  /* @media (min-width: 1024px) {
+    .infoGrid {
+      grid-template-columns: repeat(4, 1fr); 
+    } 
+  } Bạn có thể mở cái này nếu muốn 4 cột, nhưng hình bạn gửi là 2 cột nên mình để 2 cột */
+  
+  .infoCard {
+    background-color: white;
+    padding: 2rem; /* p-8 */
+    border-radius: 0.5rem; /* rounded-lg */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); /* shadow-lg */
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem; /* space-x-6 */
+    transition: transform 0.3s ease;
+  }
+  
+  .infoCard:hover {
+    transform: translateY(-0.5rem); /* hover:-translate-y-2 */
+  }
+  
+  .iconBox {
+    flex-shrink: 0;
+    width: 4rem; /* w-16 */
+    height: 4rem; /* h-16 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px; /* rounded-full */
+    
+    /* --- ĐỔI MÀU Ở ĐÂY --- */
+    background-color: #fce7f3; /* bg-pink-100 (Thay cho xanh) */
+    color: #be185d; /* text-pink-700 (Thay cho xanh) */
+  }
+  
+  .cardContent {
+    flex: 1;
+    min-width: 0; /* Fix lỗi lòi chữ */
+  }
+  
+  .cardTitle {
+    font-size: 1.25rem; /* text-xl */
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    
+    /* --- ĐỔI MÀU Ở ĐÂY --- */
+    color: #9d174d; /* text-pink-800 */
+  }
+  
+  .cardText {
+    color: #4b5563; /* text-gray-600 */
+    font-size: 1rem;
+    line-height: 1.5;
+    word-break: break-word; /* Fix lỗi lòi chữ */
+  }
+  
+  /* --- MAP & FORM SECTION --- */
+  .mapFormSection {
+    background-color: white;
+    padding: 6rem 0; /* py-24 */
+  }
+  
+  .mapFormGrid {
+    display: grid;
+    gap: 4rem; /* gap-16 */
+    align-items: flex-start;
+  }
+  
+  @media (min-width: 1024px) {
+    .mapFormGrid {
+      grid-template-columns: 3fr 2fr; /* lg:grid-cols-5 (3/5 và 2/5) */
+    }
+  }
+  
+  .sectionHeading {
+    font-size: 2.25rem; /* text-4xl */
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    
+    /* --- ĐỔI MÀU Ở ĐÂY --- */
+    color: #166534; /* Giữ màu xanh đậm cho tiêu đề (theo ảnh) hoặc đổi sang #831843 (Hồng) */
+    color: #064e3b; /* Màu xanh lá đậm như hình, nếu muốn đổi sang hồng thì dùng #831843 */
+  }
+  /* Mình sẽ đổi sang Hồng đậm cho đồng bộ nhé */
+  .sectionHeadingPink {
+      font-size: 2.25rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: #065f46; /* Màu xanh lá đậm trong hình gốc của bạn */
+  }
+  /* À thôi, bạn yêu cầu đổi tone hồng, nên mình đổi sang hồng nhé */
+  .sectionHeadingPink {
+      font-size: 2.25rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: #9d174d; /* Màu Hồng Đậm */
+  }
+  
+  
+  .mapWrapper {
+    height: 550px;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .formWrapper {
+    background-color: #f9fafb; /* bg-gray-50 */
+    padding: 2rem; /* p-8 */
+    border-radius: 0.5rem;
+  }
+  
+  .formGroup {
+    margin-bottom: 1.5rem; /* space-y-6 */
+  }
+  
+  .formLabel {
+    display: block;
+    font-size: 1.125rem; /* text-lg */
+    font-weight: 500;
+    color: #374151; /* text-gray-700 */
+    margin-bottom: 0.5rem;
+  }
+  
+  .formInput, .formTextarea {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 1rem; /* px-4 py-3 */
+    border: 1px solid #d1d5db; /* border-gray-300 */
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    outline: none;
+    font-size: 1rem;
+  }
+  
+  /* --- ĐỔI MÀU FOCUS --- */
+  .formInput:focus, .formTextarea:focus {
+    border-color: #ec4899; /* focus:border-pink-500 */
+    box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.3); /* focus:ring-pink-500 */
+  }
+  
+  .submitButton {
+    width: 100%;
+    font-weight: 700;
+    font-size: 1.125rem; /* text-lg */
+    padding: 0.75rem 1.5rem; /* py-3 px-6 */
+    border-radius: 0.5rem;
+    color: white;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s;
+    
+    /* --- ĐỔI MÀU NÚT --- */
+    background-color: #db2777; /* bg-pink-600 */
+  }
+  
+  .submitButton:hover {
+    background-color: #be185d; /* hover:bg-pink-700 */
+  }
+  
+  /* --- FAQ SECTION --- */
+  .faqSection {
+    padding-bottom: 6rem; /* pb-24 */
+  }
+  
+  .faqContainer {
+    max-width: 56rem; /* max-w-4xl */
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+  
+  .faqHeader {
+    text-align: center;
+    margin-bottom: 4rem; /* mb-16 */
+  }
+  
+  .searchBox {
+    position: relative;
+    margin-bottom: 2rem; /* mb-8 */
+  }
+  
+  .searchInput {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 3rem; /* pl-12 */
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    background-color: white;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    outline: none;
+    font-size: 1rem;
+  }
+  
+  .searchInput:focus {
+    border-color: #ec4899; /* focus:ring-pink-500 */
+    box-shadow: 0 0 0 2px #ec4899;
+  }
+  
+  .searchIcon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+  }
+  
+  .faqList {
+    background-color: white;
+    padding: 1.5rem; /* p-6 */
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .faqItem {
+    background-color: #f9fafb; /* bg-gray-50 */
+    border-radius: 0.5rem;
+    margin-bottom: 1rem; /* mb-4 */
+    overflow: hidden;
+  }
+  
+  .faqButton {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: left;
+    font-size: 1.125rem; /* text-lg */
+    font-weight: 600;
+    color: #1f2937; /* text-gray-800 */
+    padding: 1.25rem; /* p-5 */
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .faqButton:hover span {
+    /* --- ĐỔI MÀU HOVER --- */
+    color: #db2777; /* group-hover:text-pink-600 */
+  }
+  
+  .faqArrow {
+    /* --- ĐỔI MÀU MŨI TÊN --- */
+    color: #db2777; /* text-pink-600 */
+    margin-left: 1rem;
+  }
+  
+  .faqAnswer {
+    color: #4b5563; /* text-gray-600 */
+    line-height: 1.625; /* leading-relaxed */
+    padding: 0 1.25rem 1.25rem 1.25rem; /* px-5 pb-5 */
+  }
