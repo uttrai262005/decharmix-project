@@ -336,41 +336,7 @@ const deleteProduct = async (req, res) => {
       .json({ error: "Lỗi server (Có thể sản phẩm dính khóa ngoại)" });
   }
 };
-const getRelatedProducts = async (req, res) => {
-  const { id } = req.params;
 
-  try {
-    // 1. Lấy thông tin (category và tags) của sản phẩm đang xem
-    const productRes = await pool.query(
-      "SELECT category, tags FROM products WHERE id = $1",
-      [id]
-    );
-    if (productRes.rows.length === 0) {
-      return res.status(404).json({ error: "Không tìm thấy sản phẩm" });
-    }
-
-    const { category, tags } = productRes.rows[0];
-
-    // 2. Tạo câu lệnh SQL để tìm sản phẩm
-    // (Tìm 5 sản phẩm khác (NOT id) có CÙNG category HOẶC CÙNG 1 tag)
-    const query = `
-      SELECT * FROM products
-      WHERE 
-        id != $1 AND (
-          category = $2 OR 
-          tags && $3::text[] 
-        )
-      LIMIT 5;
-    `;
-
-    const relatedRes = await pool.query(query, [id, category, tags || []]);
-
-    res.json(relatedRes.rows);
-  } catch (error) {
-    console.error("Lỗi khi lấy sản phẩm liên quan:", error.message);
-    res.status(500).json({ error: "Lỗi server" });
-  }
-};
 const getAlsoBoughtProducts = async (req, res) => {
   const { id } = req.params;
 
@@ -587,6 +553,52 @@ const getForYouRecommendations = async (req, res) => {
     res.status(500).json({ error: "Lỗi server" });
   }
 };
+
+const getRelatedProducts = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // BƯỚC 1: Lấy vector của sản phẩm hiện tại
+    const productRes = await pool.query(
+      "SELECT image_vector, category FROM products WHERE id = $1",
+      [id]
+    );
+
+    if (productRes.rows.length === 0) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    const { image_vector, category } = productRes.rows[0];
+
+    // BƯỚC 2: Kiểm tra xem sản phẩm có vector chưa
+    if (!image_vector) {
+      const fallbackQuery = `
+        SELECT * FROM products 
+        WHERE id != $1 AND category = $2 
+        LIMIT 5
+      `;
+      const fallbackRes = await pool.query(fallbackQuery, [id, category]);
+      return res.json(fallbackRes.rows);
+    }
+
+    const query = `
+      SELECT 
+        id, name, image_url, price, discount_price, category,
+        (image_vector <=> $2) as distance -- Tính khoảng cách Cosine
+      FROM products
+      WHERE id != $1 AND image_vector IS NOT NULL
+      ORDER BY distance ASC -- Khoảng cách càng nhỏ => Độ giống (Similarity) càng cao
+      LIMIT 5;
+    `;
+
+    const relatedRes = await pool.query(query, [id, image_vector]);
+
+    res.json(relatedRes.rows);
+  } catch (error) {
+    console.error("Lỗi Related Products AI:", error.message);
+    res.status(500).json({ error: "Server Error" });
+  }
+};
 module.exports = {
   getProducts,
   getProductById,
@@ -602,3 +614,4 @@ module.exports = {
   initMobileNetModel,
   getForYouRecommendations,
 };
+
