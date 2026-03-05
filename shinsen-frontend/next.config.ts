@@ -7,32 +7,27 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  /* Các tùy chọn cấu hình khác của bạn */
   images: {
     remotePatterns: [
-      // Cho phép ảnh từ localhost (để hiển thị avatar)
+      // ĐÃ SỬA: Cho phép ảnh avatar từ máy chủ Render
       {
-        protocol: "http",
-        hostname: "localhost",
-        port: "5000",
+        protocol: "https",
+        hostname: "shinsen-backend-api.onrender.com",
+        port: "",
         pathname: "/uploads/avatars/**",
       },
-      // Cho phép ảnh từ nanghandmade.com
       {
         protocol: "https",
         hostname: "nanghandmade.com",
         port: "",
         pathname: "/wp-content/uploads/**",
       },
-      // Cho phép ảnh từ meomeocharm.com
       {
         protocol: "https",
         hostname: "meomeocharm.com",
         port: "",
         pathname: "/wp-content/uploads/**",
       },
-
-      // === CÁC LINK CÒN THIẾU ĐÃ ĐƯỢC THÊM ===
       {
         protocol: "https",
         hostname: "pos.nvncdn.com",
@@ -48,18 +43,18 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "lh3.googleusercontent.com",
-        port: "", // Không cần port
-        pathname: "/**", // Cho phép bất kỳ đường dẫn nào sau hostname
+        port: "",
+        pathname: "/**",
       },
     ],
   },
 
-  // Giữ lại cấu hình rewrites cho API
   async rewrites() {
     return [
       {
         source: "/api/:path*",
-        destination: "http://localhost:5000/api/:path*",
+        // ĐÃ SỬA: Trỏ API thẳng về máy chủ Render
+        destination: "https://shinsen-backend-api.onrender.com/api/:path*",
       },
     ];
   },
