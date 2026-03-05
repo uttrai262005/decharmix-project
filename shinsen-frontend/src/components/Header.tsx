@@ -19,8 +19,12 @@ import styles from "./Header.module.css";
 import VisualSearchModal from "./VisualSearchModal";
 
 // Lấy API URL
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
-
+// Lệnh này sẽ tự động xóa mọi dấu gạch chéo và khoảng trắng thừa ở cuối URL
+const API_URL = (
+  process.env.NEXT_PUBLIC_API_URL || "https://shinsen-backend-api.onrender.com"
+)
+  .replace(/\/+$/, "")
+  .trim();
 // Interface cho sản phẩm trong kết quả tìm kiếm
 interface SearchResult {
   id: number;
