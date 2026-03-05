@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react"; // Thêm import Suspense
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "react-hot-toast";
@@ -25,7 +25,8 @@ const styles = {
   },
 };
 
-export default function AuthCallbackPage() {
+// 1. Tách phần logic hiện tại thành một Component con
+function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { login } = useAuth();
@@ -63,5 +64,21 @@ export default function AuthCallbackPage() {
       <span style={styles.loader}>🌀</span>
       <p style={styles.text}>Đang xác thực, vui lòng chờ...</p>
     </div>
+  );
+}
+
+// 2. Tạo Component mặc định và bọc Component con bằng Suspense
+export default function AuthCallbackPage() {
+  return (
+    <Suspense
+      fallback={
+        <div style={styles.loaderWrapper}>
+          <span style={styles.loader}>🌀</span>
+          <p style={styles.text}>Đang tải dữ liệu...</p>
+        </div>
+      }
+    >
+      <AuthCallbackContent />
+    </Suspense>
   );
 }
