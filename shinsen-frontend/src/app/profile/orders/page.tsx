@@ -47,10 +47,8 @@ export default function OrdersPage() {
       try {
         const status = STATUS_MAP[activeTab] || "Tất cả";
         const response = await fetch(
-          `${API_URL}/api/orders?status=${encodeURIComponent(status)}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
+          `${API_URL}/api/orders/my-orders?status=${encodeURIComponent(status)}`,
+          { headers: { Authorization: `Bearer ${token}` } },
         );
 
         if (!response.ok) {
