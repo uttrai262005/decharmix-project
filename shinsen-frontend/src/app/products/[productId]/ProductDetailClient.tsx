@@ -87,8 +87,9 @@ const RelatedProductCard = ({ product }: { product: Product }) => {
 // ===================================
 
 const DEFAULT_IMAGE = "/placeholder.png";
-const API_URL = process.env.NEXT_PUBLIC_API_URL; // Lấy API Backend
-
+// Sửa dòng này (khoảng dòng 104)
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "https://shinsen-backend-api.onrender.com";
 // --- COMPONENT CHÍNH ---
 export default function ProductDetailClient({
   product,
@@ -104,7 +105,7 @@ export default function ProductDetailClient({
   // States
   const [reviews, setReviews] = useState<Review[]>([]);
   const [averageRating, setAverageRating] = useState(
-    product.average_rating || 0
+    product.average_rating || 0,
   );
   const [isLoadingReviews, setIsLoadingReviews] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -132,7 +133,7 @@ export default function ProductDetailClient({
       if (data.length > 0) {
         const totalRating = data.reduce(
           (acc, review) => acc + review.rating,
-          0
+          0,
         );
         setAverageRating(totalRating / data.length);
       } else {
@@ -157,7 +158,7 @@ export default function ProductDetailClient({
       try {
         // ƯU TIÊN 1: Thử lấy "Mua cùng" (Phương án 2)
         const alsoBoughtRes = await fetch(
-          `${API_URL}/api/products/${product.id}/also-bought`
+          `${API_URL}/api/products/${product.id}/also-bought`,
         );
         if (alsoBoughtRes.ok) {
           const alsoBoughtData = await alsoBoughtRes.json();
@@ -170,7 +171,7 @@ export default function ProductDetailClient({
 
         // DỰ PHÒNG: Nếu không tìm thấy (Cold Start), lấy "Sản phẩm liên quan" (Phương án 1)
         const relatedRes = await fetch(
-          `${API_URL}/api/products/${product.id}/related`
+          `${API_URL}/api/products/${product.id}/related`,
         );
         if (relatedRes.ok) {
           const relatedData = await relatedRes.json();
@@ -245,7 +246,7 @@ export default function ProductDetailClient({
   };
   const prevImage = () => {
     setCurrentImageIndex(
-      (prevIndex) => (prevIndex - 1 + images.length) % images.length
+      (prevIndex) => (prevIndex - 1 + images.length) % images.length,
     );
   };
 
@@ -258,7 +259,7 @@ export default function ProductDetailClient({
   // (Hàm tính giảm giá)
   const calculateDiscountPercent = (
     originalPrice: number,
-    discountPrice: number
+    discountPrice: number,
   ) => {
     if (!discountPrice || discountPrice >= originalPrice) return 0;
     const discount = ((originalPrice - discountPrice) / originalPrice) * 100;
@@ -268,7 +269,7 @@ export default function ProductDetailClient({
   const discountPercent = product.discount_price
     ? calculateDiscountPercent(
         Number(product.price),
-        Number(product.discount_price)
+        Number(product.discount_price),
       )
     : 0;
 
@@ -350,7 +351,9 @@ export default function ProductDetailClient({
           <div className={styles.ratingWrapper}>
             <StarRating rating={averageRating} />
             {reviews.length > 0 && (
-              <span className={styles.reviewCountText}>({reviews.length} đánh giá)</span>
+              <span className={styles.reviewCountText}>
+                ({reviews.length} đánh giá)
+              </span>
             )}
           </div>
 
