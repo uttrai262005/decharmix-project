@@ -21,7 +21,7 @@ import styles from "./CheckoutPage.module.css";
 
 type PaymentMethod = "bank" | "cod" | "momo" | "vnpay" | "zalopay";
 
-// === KHAI BÁO INTERFACE ===
+// --- INTERFACES ---
 interface Province {
   code: number;
   name: string;
@@ -44,22 +44,21 @@ interface Voucher {
   min_order_value: number;
   max_discount?: number;
 }
-// ===================================
+
+// --- XỬ LÝ URL AN TOÀN ---
+const rawUrl =
+  process.env.NEXT_PUBLIC_API_URL || "https://shinsen-backend-api.onrender.com";
+const API_URL = rawUrl.endsWith("/") ? rawUrl.slice(0, -1) : rawUrl;
 
 export default function CheckoutPage() {
   const { cartItems, cartTotal, itemCount, clearCart } = useCart();
   const { token, user } = useAuth();
   const router = useRouter();
 
-  // === SỬA 1: THÊM BIẾN API_URL ===
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-  // State cho địa chỉ
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [districts, setDistricts] = useState<District[]>([]);
   const [wards, setWards] = useState<Ward[]>([]);
 
-  // State cho form
   const [shippingInfo, setShippingInfo] = useState({
     name: "",
     phone: "",
@@ -70,17 +69,15 @@ export default function CheckoutPage() {
   });
   const [selectedPayment, setSelectedPayment] = useState<PaymentMethod>("bank");
 
-  // State cho Khuyến mãi
   const [myVouchers, setMyVouchers] = useState<Voucher[]>([]);
   const [isVoucherModalOpen, setIsVoucherModalOpen] = useState(false);
   const [voucherInput, setVoucherInput] = useState("");
   const [voucherDiscount, setVoucherDiscount] = useState(0);
   const [appliedVoucherCode, setAppliedVoucherCode] = useState<string | null>(
-    null
+    null,
   );
   const [useCoins, setUseCoins] = useState(false);
 
-  // State cho Quà tặng
   const [isDigitalGift, setIsDigitalGift] = useState(false);
   const [recipientInfo, setRecipientInfo] = useState({
     recipientName: "",
@@ -88,7 +85,6 @@ export default function CheckoutPage() {
     recipientMessage: "",
   });
 
-  // State cho Đơn hàng & Lỗi
   const [promoError, setPromoError] = useState<string | null>(null);
   const [promoSuccess, setPromoSuccess] = useState<string | null>(null);
   const [orderData, setOrderData] = useState<{
@@ -99,34 +95,33 @@ export default function CheckoutPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Lấy danh sách voucher của user
+  // Lấy danh sách voucher
   useEffect(() => {
-    // === SỬA 2: THÊM API_URL VÀO FETCH ===
-    if (token && API_URL) {
+    if (token) {
       fetch(`${API_URL}/api/vouchers/my`, {
-        // <--- SỬA Ở ĐÂY
         headers: { Authorization: `Bearer ${token}` },
       })
         .then((res) => {
-          if (!res.ok) throw new Error("Lỗi tải voucher");
+          const contentType = res.headers.get("content-type");
+          if (!res.ok || !contentType?.includes("application/json"))
+            throw new Error("Lỗi tải voucher");
           return res.json();
         })
         .then((data) => setMyVouchers(data))
-        .catch((err) => console.error("Không thể tải voucher của bạn:", err));
+        .catch((err) => console.error("Không thể tải voucher:", err));
     }
-  }, [token, API_URL]); // <--- Thêm API_URL
+  }, [token]);
 
-  // Lấy danh sách Tỉnh/Thành (Dùng API ngoài, không cần sửa)
+  // Lấy Tỉnh/Thành
   useEffect(() => {
     fetch("https://provinces.open-api.vn/api/p/")
       .then((res) => res.json())
       .then((data: Province[]) => setProvinces(data))
-      .catch((err) => console.error("Lỗi khi tải danh sách tỉnh thành:", err));
+      .catch((err) => console.error("Lỗi địa chỉ:", err));
   }, []);
 
-  // Xử lý thay đổi input/select địa chỉ (shippingInfo)
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
     let newShippingInfo = { ...shippingInfo, [name]: value };
@@ -169,45 +164,36 @@ export default function CheckoutPage() {
     setShippingInfo(newShippingInfo);
   };
 
-  // Hàm cho form Quà tặng
   const handleRecipientChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    setRecipientInfo({
-      ...recipientInfo,
-      [e.target.name]: e.target.value,
-    });
+    setRecipientInfo({ ...recipientInfo, [e.target.name]: e.target.value });
   };
 
-  // Tính toán lại tổng tiền
   const { coinDiscount, finalTotal, maxCoinsAllowed } = useMemo(() => {
     const userCoins = user?.coins || 0;
-    const originalTotal = cartTotal;
-    const totalAfterVoucher = originalTotal - voucherDiscount;
-    const calculatedMaxCoins = Math.floor(originalTotal * 0.5); // 50%
+    const calculatedMaxCoins = Math.floor(cartTotal * 0.5);
     const coinsToUse = Math.min(
       userCoins,
       calculatedMaxCoins,
-      totalAfterVoucher
+      cartTotal - voucherDiscount,
     );
     const calculatedCoinDiscount = useCoins ? coinsToUse : 0;
-    const calculatedFinalTotal = totalAfterVoucher - calculatedCoinDiscount;
+    const calculatedFinalTotal =
+      cartTotal - voucherDiscount - calculatedCoinDiscount;
     return {
       coinDiscount: calculatedCoinDiscount,
-      finalTotal: calculatedFinalTotal < 0 ? 0 : calculatedFinalTotal,
+      finalTotal: Math.max(0, calculatedFinalTotal),
       maxCoinsAllowed: coinsToUse,
     };
   }, [cartTotal, voucherDiscount, useCoins, user]);
 
-  // Hàm Áp dụng Voucher
   const handleApplyVoucher = async (code: string) => {
-    // === SỬA 3: THÊM API_URL VÀO FETCH ===
-    if (!code || !API_URL) return;
+    if (!code) return;
     setPromoError(null);
     setPromoSuccess(null);
     try {
       const res = await fetch(`${API_URL}/api/orders/apply-voucher`, {
-        // <--- SỬA Ở ĐÂY
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -230,42 +216,20 @@ export default function CheckoutPage() {
     }
   };
 
-  // Hàm Bật/Tắt Xu
-  const handleToggleCoins = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUseCoins(e.target.checked);
-  };
-
-  // --- HÀM ĐẶT HÀNG ---
-  const validateShippingInfo = () => {
-    const { name, phone, address, ward, district, province } = shippingInfo;
-    return !(!name || !phone || !address || !ward || !district || !province);
-  };
-
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    // Validate (logic quà tặng)
-    if (!isDigitalGift && !validateShippingInfo()) {
-      setError("Vui lòng điền đầy đủ thông tin giao hàng.");
-      return;
-    }
     if (
-      isDigitalGift &&
-      (!recipientInfo.recipientName || !recipientInfo.recipientEmail)
+      !isDigitalGift &&
+      (!shippingInfo.name || !shippingInfo.phone || !shippingInfo.province)
     ) {
-      setError("Vui lòng nhập Tên và Email của người nhận quà.");
-      return;
-    }
-    // === SỬA 4: THÊM CHECK API_URL ===
-    if (!API_URL) {
-      setError("Lỗi cấu hình: Không thể kết nối tới máy chủ.");
+      setError("Vui lòng điền đầy đủ thông tin giao hàng.");
       return;
     }
 
     setIsLoading(true);
     try {
-      // Build payload
       const payload = {
         cartItems,
         total: finalTotal,
@@ -274,18 +238,11 @@ export default function CheckoutPage() {
         discountAmount: voucherDiscount,
         coinsUsed: useCoins ? coinDiscount : 0,
         coinDiscountAmount: coinDiscount,
-        isDigitalGift: isDigitalGift,
+        isDigitalGift,
+        ...(isDigitalGift ? recipientInfo : { shippingInfo }),
       };
 
-      if (isDigitalGift) {
-        Object.assign(payload, recipientInfo);
-      } else {
-        Object.assign(payload, { shippingInfo });
-      }
-
-      // === SỬA 5: THÊM API_URL VÀO FETCH ===
       const response = await fetch(`${API_URL}/api/orders`, {
-        // <--- SỬA Ở ĐÂY
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -293,11 +250,9 @@ export default function CheckoutPage() {
         },
         body: JSON.stringify(payload),
       });
-      // ======================================
 
       const data = await response.json();
-      if (!response.ok)
-        throw new Error(data.error || "Có lỗi xảy ra khi tạo đơn hàng.");
+      if (!response.ok) throw new Error(data.error || "Lỗi tạo đơn hàng.");
 
       clearCart();
 
@@ -310,7 +265,6 @@ export default function CheckoutPage() {
       } else if (data.payUrl) {
         window.location.href = data.payUrl;
       } else {
-        // COD hoặc Quà Tặng (không cần thanh toán ngay)
         router.push("/order-result?status=success");
       }
     } catch (err: any) {
@@ -320,31 +274,22 @@ export default function CheckoutPage() {
     }
   };
 
-  // Màn hình QR
   if (orderData) {
     return (
       <div className={styles.pageWrapper}>
         <div className={styles.qrSuccessScreen}>
           <h3>Đặt hàng thành công!</h3>
-          <p>Vui lòng quét mã VietQR bên dưới để hoàn tất thanh toán.</p>
           <div className={styles.qrContainer}>
-            <QRCode
-              value={orderData.vietQRString}
-              size={256}
-              viewBox={`0 0 256 256`}
-            />
+            <QRCode value={orderData.vietQRString} size={256} />
             <div className={styles.qrInfo}>
-              <p>Tổng tiền</p>
-              <p className={styles.qrAmount}>
-                {orderData.total.toLocaleString("vi-VN")} ₫
+              <p>
+                Tổng tiền: <strong>{orderData.total.toLocaleString()} ₫</strong>
               </p>
-              <p>Nội dung chuyển khoản</p>
-              <p className={styles.bankMemo}>{orderData.orderCode}</p>
+              <p>
+                Nội dung: <strong>{orderData.orderCode}</strong>
+              </p>
             </div>
           </div>
-          <p className={styles.bankNote}>
-            Sau khi chuyển khoản, hệ thống sẽ tự động xác nhận đơn hàng của bạn.
-          </p>
           <Link href="/profile/orders" className={styles.viewOrderButton}>
             Xem lịch sử đơn hàng
           </Link>
@@ -353,19 +298,8 @@ export default function CheckoutPage() {
     );
   }
 
-  // Lấy văn bản cho nút bấm
-  const getButtonText = () => {
-    if (isLoading) return "ĐANG XỬ LÝ...";
-    if (selectedPayment === "momo") return "TIẾP TỤC VỚI MOMO";
-    if (selectedPayment === "vnpay") return "TIẾP TỤC VỚI VNPAY";
-    if (selectedPayment === "zalopay") return "TIẾP TỤC VỚI ZALOPAY";
-    return "HOÀN TẤT ĐẶT HÀNG";
-  };
-
-  // --- GIAO DIỆN CHECKOUT CHÍNH ---
   return (
     <>
-      {/* === MODAL VOUCHER === */}
       {isVoucherModalOpen && (
         <div
           className={styles.modalOverlay}
@@ -376,7 +310,7 @@ export default function CheckoutPage() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className={styles.modalHeader}>
-              <h3>Ví Voucher Của Bạn</h3>
+              <h3>Ví Voucher</h3>
               <button
                 onClick={() => setIsVoucherModalOpen(false)}
                 className={styles.closeModalButton}
@@ -385,24 +319,15 @@ export default function CheckoutPage() {
               </button>
             </div>
             <div className={styles.voucherList}>
-              {(() => {
-                // BƯỚC 1: Lọc ra những voucher hợp lệ trước
-                const validVouchers = myVouchers.filter(
-                  (v) => v.min_order_value <= cartTotal
-                );
-
-                // BƯỚC 2: Kiểm tra danh sách ĐÃ LỌC
-                if (validVouchers.length > 0) {
-                  // Trường hợp CÓ voucher hợp lệ -> Hiện danh sách
-                  return validVouchers.map((voucher) => (
+              {myVouchers.filter((v) => v.min_order_value <= cartTotal).length >
+              0 ? (
+                myVouchers
+                  .filter((v) => v.min_order_value <= cartTotal)
+                  .map((voucher) => (
                     <div key={voucher.id} className={styles.voucherCard}>
                       <div className={styles.voucherInfo}>
                         <p className={styles.voucherCode}>{voucher.code}</p>
-                        <p className={styles.voucherDesc}>{voucher.description}</p>
-                        <p className={styles.voucherMin}>
-                          Đơn tối thiểu:{" "}
-                          {Number(voucher.min_order_value).toLocaleString("vi-VN")} ₫
-                        </p>
+                        <p>{voucher.description}</p>
                       </div>
                       <button
                         onClick={() => handleApplyVoucher(voucher.code)}
@@ -411,22 +336,15 @@ export default function CheckoutPage() {
                         Áp dụng
                       </button>
                     </div>
-                  ));
-                } else {
-                  // Trường hợp KHÔNG CÓ voucher nào hợp lệ -> Hiện thông báo
-                  return (
-                    <div className={styles.emptyVoucherState}>
-                      <p>Oops! Ví Voucher của bạn đang trống.</p>
-                    </div>
-                  );
-                }
-              })()}
+                  ))
+              ) : (
+                <p>Không có voucher phù hợp.</p>
+              )}
             </div>
           </div>
         </div>
       )}
 
-      {/* === TRANG CHECKOUT CHÍNH === */}
       <div className={styles.pageWrapper}>
         <div className={styles.mainLayout}>
           <div className={styles.leftColumn}>
@@ -434,12 +352,9 @@ export default function CheckoutPage() {
               Decharmix Checkout
             </Link>
             <form onSubmit={handlePlaceOrder}>
-              {/* === CHECKBOX QUÀ TẶNG === */}
               <div className={styles.section}>
                 <label
-                  className={`${styles.giftToggle} ${
-                    isDigitalGift ? styles.active : ""
-                  }`}
+                  className={`${styles.giftToggle} ${isDigitalGift ? styles.active : ""}`}
                 >
                   <input
                     type="checkbox"
@@ -447,29 +362,25 @@ export default function CheckoutPage() {
                     onChange={() => setIsDigitalGift(!isDigitalGift)}
                   />
                   <FiGift /> Gửi dưới dạng Quà tặng tức thì
-                  <span>(Gửi link cho người nhận tự điền địa chỉ)</span>
                 </label>
               </div>
 
-              {/* --- Thông tin giao hàng (Đơn thường) --- */}
-              {!isDigitalGift && (
+              {!isDigitalGift ? (
                 <div className={styles.section}>
                   <h3 className={styles.sectionTitle}>
-                    <FiHome /> Thông tin giao hàng
+                    <FiHome /> Giao hàng
                   </h3>
                   <div className={styles.formGrid}>
                     <input
                       name="name"
-                      type="text"
-                      placeholder="Họ và tên"
+                      placeholder="Họ tên"
                       required
                       onChange={handleInputChange}
                       value={shippingInfo.name}
                     />
                     <input
                       name="phone"
-                      type="tel"
-                      placeholder="Số điện thoại"
+                      placeholder="SĐT"
                       required
                       onChange={handleInputChange}
                       value={shippingInfo.phone}
@@ -483,7 +394,7 @@ export default function CheckoutPage() {
                           ?.code || ""
                       }
                     >
-                      <option value="">-- Chọn Tỉnh/Thành phố --</option>
+                      <option value="">Tỉnh/Thành</option>
                       {provinces.map((p) => (
                         <option key={p.code} value={p.code}>
                           {p.name}
@@ -494,13 +405,12 @@ export default function CheckoutPage() {
                       name="district"
                       required
                       onChange={handleInputChange}
-                      disabled={!districts.length}
                       value={
                         districts.find((d) => d.name === shippingInfo.district)
                           ?.code || ""
                       }
                     >
-                      <option value="">-- Chọn Quận/Huyện --</option>
+                      <option value="">Quận/Huyện</option>
                       {districts.map((d) => (
                         <option key={d.code} value={d.code}>
                           {d.name}
@@ -511,10 +421,9 @@ export default function CheckoutPage() {
                       name="ward"
                       required
                       onChange={handleInputChange}
-                      disabled={!wards.length}
-                      value={shippingInfo.ward} // Giá trị là Tên
+                      value={shippingInfo.ward}
                     >
-                      <option value="">-- Chọn Phường/Xã --</option>
+                      <option value="">Phường/Xã</option>
                       {wards.map((w) => (
                         <option key={w.code} value={w.name}>
                           {w.name}
@@ -523,26 +432,21 @@ export default function CheckoutPage() {
                     </select>
                     <input
                       name="address"
-                      type="text"
-                      placeholder="Số nhà, tên đường"
+                      placeholder="Địa chỉ chi tiết"
                       required
                       onChange={handleInputChange}
                       value={shippingInfo.address}
                     />
                   </div>
                 </div>
-              )}
-
-              {/* === FORM QUÀ TẶNG (Đơn quà) === */}
-              {isDigitalGift && (
+              ) : (
                 <div className={styles.section}>
                   <h3 className={styles.sectionTitle}>
-                    <FiGift /> Thông tin người nhận quà
+                    <FiGift /> Người nhận
                   </h3>
                   <div className={styles.formGrid}>
                     <input
                       name="recipientName"
-                      type="text"
                       placeholder="Tên người nhận"
                       required
                       onChange={handleRecipientChange}
@@ -550,226 +454,121 @@ export default function CheckoutPage() {
                     <input
                       name="recipientEmail"
                       type="email"
-                      placeholder="Email người nhận (để gửi link)"
+                      placeholder="Email người nhận"
                       required
                       onChange={handleRecipientChange}
                     />
                     <textarea
                       name="recipientMessage"
-                      placeholder="Lời nhắn của bạn..."
+                      placeholder="Lời nhắn..."
                       onChange={handleRecipientChange}
-                      className={styles.fullWidthInput}
                     />
                   </div>
                 </div>
               )}
 
-              {/* --- Phương thức thanh toán --- */}
               <div className={styles.section}>
                 <h3 className={styles.sectionTitle}>
-                  <FiCreditCard /> Phương thức thanh toán
+                  <FiCreditCard /> Thanh toán
                 </h3>
                 <div className={styles.paymentOptions}>
                   <div
-                    className={`${styles.paymentOption} ${
-                      selectedPayment === "bank" ? styles.selected : ""
-                    }`}
+                    className={`${styles.paymentOption} ${selectedPayment === "bank" ? styles.selected : ""}`}
                     onClick={() => setSelectedPayment("bank")}
                   >
-                    <Image
-                      src="/payment-bank.svg"
-                      alt="Bank"
-                      width={40}
-                      height={40}
-                      style={{ height: "auto" }}
-                    />
-                    <span>VietQR</span>
+                    VietQR
                   </div>
                   <div
-                    className={`${styles.paymentOption} ${
-                      selectedPayment === "momo" ? styles.selected : ""
-                    }`}
+                    className={`${styles.paymentOption} ${selectedPayment === "momo" ? styles.selected : ""}`}
                     onClick={() => setSelectedPayment("momo")}
                   >
-                    <Image
-                      src="/payment-momo.svg"
-                      alt="Momo"
-                      width={40}
-                      height={40}
-                      style={{ height: "auto" }}
-                    />
-                    <span>Ví MoMo</span>
+                    MoMo
                   </div>
-                  <div
-                    className={`${styles.paymentOption} ${
-                      selectedPayment === "vnpay" ? styles.selected : ""
-                    }`}
-                    onClick={() => setSelectedPayment("vnpay")}
-                  >
-                    <Image
-                      src="/payment-vnpay.svg"
-                      alt="VNPay"
-                      width={40}
-                      height={40}
-                      style={{ height: "auto" }}
-                    />
-                    <span>Cổng VNPay</span>
-                  </div>
-                  <div
-                    className={`${styles.paymentOption} ${
-                      selectedPayment === "zalopay" ? styles.selected : ""
-                    }`}
-                    onClick={() => setSelectedPayment("zalopay")}
-                  >
-                    <Image
-                      src="/payment-zalopay.svg"
-                      alt="ZaloPay"
-                      width={40}
-                      height={40}
-                      style={{ height: "auto" }}
-                    />
-                    <span>Ví ZaloPay</span>
-                  </div>
-                  {/* Ẩn COD nếu là quà tặng */}
                   {!isDigitalGift && (
                     <div
-                      className={`${styles.paymentOption} ${
-                        selectedPayment === "cod" ? styles.selected : ""
-                      }`}
+                      className={`${styles.paymentOption} ${selectedPayment === "cod" ? styles.selected : ""}`}
                       onClick={() => setSelectedPayment("cod")}
                     >
-                      <Image
-                        src="/payment-cod.svg"
-                        alt="COD"
-                        width={40}
-                        height={40}
-                        style={{ height: "auto" }}
-                      />
-                      <span>Tiền mặt (COD)</span>
+                      COD
                     </div>
                   )}
                 </div>
               </div>
-
-              {/* Nút Đặt hàng */}
-              {error && <p className={styles.errorText}>{error}</p>}
               <button
                 type="submit"
                 className={styles.placeOrderButton}
                 disabled={isLoading}
               >
-                <FiLock />
-                <span>{getButtonText()}</span>
+                <FiLock /> {isLoading ? "ĐANG XỬ LÝ..." : "HOÀN TẤT ĐẶT HÀNG"}
               </button>
             </form>
           </div>
 
-          {/* === CỘT BÊN PHẢI (TÓM TẮT ĐƠN HÀNG) === */}
           <div className={styles.rightColumn}>
             <div className={styles.summaryCard}>
               <h3 className={styles.sectionTitle}>
-                <FiPackage /> Tóm tắt đơn hàng ({itemCount})
+                <FiPackage /> Đơn hàng ({itemCount})
               </h3>
-              <div className={styles.orderItems}>
-                {cartItems.map((item) => (
-                  <div key={item.product_id} className={styles.orderItem}>
-                    <div className={styles.itemImage}>
-                      <Image
-                        src={item.image_url || "/placeholder.png"}
-                        alt={item.name}
-                        width={64}
-                        height={64}
-                      />
-                      <span className={styles.itemQuantity}>
-                        {item.quantity}
-                      </span>
-                    </div>
-                    <div className={styles.itemName}>{item.name}</div>
-                    <div className={styles.itemPrice}>
-                      {(
-                        (item.discount_price || item.price) * item.quantity
-                      ).toLocaleString("vi-VN")}{" "}
-                      ₫
-                    </div>
+              {cartItems.map((item) => (
+                <div key={item.product_id} className={styles.orderItem}>
+                  <div className={styles.itemImage}>
+                    <Image
+                      src={item.image_url || "/placeholder.png"}
+                      alt={item.name}
+                      width={40}
+                      height={40}
+                    />
                   </div>
-                ))}
-              </div>
-
-              {/* --- KHUNG KHUYẾN MÃI --- */}
-              <div className={styles.promoSection}>
-                <h3 className={styles.sectionTitle}>
-                  <FiTag /> Khuyến mãi
-                </h3>
-                <div className={styles.voucherInputGroup}>
-                  <input
-                    type="text"
-                    placeholder="Nhập mã voucher"
-                    value={voucherInput}
-                    onChange={(e) => setVoucherInput(e.target.value)}
-                    disabled={!!appliedVoucherCode}
-                  />
-                  <button
-                    type="button"
-                    className={styles.applyButton}
-                    onClick={() => handleApplyVoucher(voucherInput)}
-                    disabled={!!appliedVoucherCode}
-                  >
-                    Áp dụng
-                  </button>
+                  <div className={styles.itemName}>
+                    {item.name} (x{item.quantity})
+                  </div>
+                  <div>
+                    {(
+                      (item.discount_price || item.price) * item.quantity
+                    ).toLocaleString()}{" "}
+                    ₫
+                  </div>
                 </div>
+              ))}
+              <div className={styles.promoSection}>
                 <button
                   type="button"
                   className={styles.openModalButton}
                   onClick={() => setIsVoucherModalOpen(true)}
                 >
-                  <FiTag /> Chọn voucher của Decharmix
+                  <FiTag /> Chọn voucher
                 </button>
                 {user && user.coins > 0 && (
-                  <div className={styles.coinSection}>
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={useCoins}
-                        onChange={handleToggleCoins}
-                      />
-                      Sử dụng {user.coins.toLocaleString("vi-VN")} Decharmix Xu
-                      (Tối đa: {maxCoinsAllowed.toLocaleString("vi-VN")} Xu)
-                    </label>
-                  </div>
-                )}
-                {promoError && (
-                  <p className={styles.promoMessageError}>{promoError}</p>
-                )}
-                {promoSuccess && (
-                  <p className={styles.promoMessageSuccess}>{promoSuccess}</p>
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={useCoins}
+                      onChange={(e) => setUseCoins(e.target.checked)}
+                    />{" "}
+                    Dùng {user.coins} Xu
+                  </label>
                 )}
               </div>
-
-              {/* --- KHUNG TỔNG TIỀN --- */}
               <div className={styles.costSummary}>
                 <div className={styles.costRow}>
-                  <span>Tạm tính</span>
-                  <span>{cartTotal.toLocaleString("vi-VN")} ₫</span>
-                </div>
-                <div className={styles.costRow}>
-                  <span>Phí vận chuyển</span>
-                  <span>Miễn phí</span>
+                  <span>Tạm tính:</span>
+                  <span>{cartTotal.toLocaleString()} ₫</span>
                 </div>
                 {voucherDiscount > 0 && (
-                  <div className={`${styles.costRow} ${styles.discount}`}>
-                    <span>Giảm giá Voucher ({appliedVoucherCode})</span>
-                    <span>- {voucherDiscount.toLocaleString("vi-VN")} ₫</span>
+                  <div className={styles.costRow}>
+                    <span>Giảm Voucher:</span>
+                    <span>-{voucherDiscount.toLocaleString()} ₫</span>
                   </div>
                 )}
                 {coinDiscount > 0 && (
-                  <div className={`${styles.costRow} ${styles.discount}`}>
-                    <span>Giảm giá Xu</span>
-                    <span>- {coinDiscount.toLocaleString("vi-VN")} ₫</span>
+                  <div className={styles.costRow}>
+                    <span>Giảm Xu:</span>
+                    <span>-{coinDiscount.toLocaleString()} ₫</span>
                   </div>
                 )}
-                <div className={`${styles.costRow} ${styles.grandTotal}`}>
-                  <span>Tổng cộng</span>
-                  <span>{finalTotal.toLocaleString("vi-VN")} ₫</span>
+                <div className={styles.grandTotal}>
+                  <span>Tổng cộng:</span>
+                  <span>{finalTotal.toLocaleString()} ₫</span>
                 </div>
               </div>
             </div>
