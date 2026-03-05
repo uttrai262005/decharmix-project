@@ -47,6 +47,7 @@ export default function CustomerEditPage() {
         });
         if (!res.ok) throw new Error("Không tìm thấy khách hàng");
         setCustomer(await res.json());
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         toast.error(error.message);
         router.push("/customers");
@@ -87,6 +88,7 @@ export default function CustomerEditPage() {
 
       toast.success("Cập nhật khách hàng thành công!");
       router.push("/customers");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(error.message);
     } finally {

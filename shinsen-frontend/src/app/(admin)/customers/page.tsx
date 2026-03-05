@@ -40,7 +40,7 @@ export default function AdminCustomersPage() {
           `/api/customers?page=${page}&search=${search}`,
           {
             headers: { Authorization: `Bearer ${token}` },
-          }
+          },
         );
         if (!res.ok) throw new Error("Không thể tải danh sách");
 
@@ -48,6 +48,7 @@ export default function AdminCustomersPage() {
         setCustomers(data.customers);
         setTotalPages(data.totalPages);
         setCurrentPage(data.currentPage);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         toast.error(error.message);
       } finally {
