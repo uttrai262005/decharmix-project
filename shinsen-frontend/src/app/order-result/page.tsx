@@ -2,14 +2,15 @@
 
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react"; // <-- Thêm Suspense ở đây
 import { FiCheckCircle, FiXCircle } from "react-icons/fi";
 import styles from "./OrderResult.module.css";
 
-export default function OrderResultPage() {
+// 1. Tách phần logic hiển thị ra một Component con
+function OrderResultContent() {
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<"loading" | "success" | "failure">(
-    "loading"
+    "loading",
   );
   const [message, setMessage] = useState("Đang xử lý kết quả...");
 
@@ -37,7 +38,7 @@ export default function OrderResultPage() {
         setStatus("failure");
         setMessage(
           searchParams.get("message") ||
-            "Giao dịch MoMo không thành công hoặc đã bị hủy."
+            "Giao dịch MoMo không thành công hoặc đã bị hủy.",
         );
       }
       return;
@@ -49,7 +50,7 @@ export default function OrderResultPage() {
       if (zalo_Status === "1") {
         setStatus("success");
         setMessage(
-          "Thanh toán qua ZaloPay thành công! Cảm ơn bạn đã mua hàng."
+          "Thanh toán qua ZaloPay thành công! Cảm ơn bạn đã mua hàng.",
         );
       } else {
         setStatus("failure");
@@ -61,7 +62,7 @@ export default function OrderResultPage() {
     // Fallback if no params found (e.g., for COD)
     setStatus("success");
     setMessage(
-      "Đặt hàng thành công! Chúng tôi sẽ sớm liên hệ với bạn để xác nhận."
+      "Đặt hàng thành công! Chúng tôi sẽ sớm liên hệ với bạn để xác nhận.",
     );
   }, [searchParams]);
 
@@ -102,5 +103,20 @@ export default function OrderResultPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// 2. Component mặc định được bọc bởi Suspense
+export default function OrderResultPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className={styles.container}>
+          <p>Đang tải dữ liệu...</p>
+        </div>
+      }
+    >
+      <OrderResultContent />
+    </Suspense>
   );
 }
