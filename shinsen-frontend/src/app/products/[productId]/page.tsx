@@ -4,42 +4,39 @@ import ProductDetailClient from "./ProductDetailClient";
 import styles from "./ProductDetailPage.module.css";
 import { notFound } from "next/navigation";
 
-// Hàm lấy dữ liệu từ Backend Render thay vì gọi trực tiếp Supabase
-async function getProductById(productId: number) {
-  const API_URL =
-    process.env.NEXT_PUBLIC_API_URL ||
-    "https://shinsen-backend-api.onrender.com";
+// Dùng link trực tiếp để đảm bảo không bị lỗi biến môi trường
+const API_URL = "https://shinsen-backend-api.onrender.com";
 
+async function getProductById(id: string) {
   try {
-    // Gọi đến API sản phẩm mà Backend đã cung cấp
-    const res = await fetch(`${API_URL}/api/products/${productId}`, {
+    // Xử lý nếu ID có dạng "product-1"
+    const numericId = id.replace("product-", "");
+
+    const res = await fetch(`${API_URL}/api/products/${numericId}`, {
       cache: "no-store",
+      headers: { "Content-Type": "application/json" },
     });
 
     if (!res.ok) return null;
     return await res.json();
   } catch (error) {
-    console.error("Lỗi fetch sản phẩm từ Render:", error);
+    console.error("Lỗi fetch sản phẩm:", error);
     return null;
   }
 }
 
-type ProductDetailPageProps = {
-  params: { productId: string };
-};
-
+// LƯU Ý: Tên biến phải khớp với tên thư mục [productId]
 export default async function ProductDetailPage({
   params,
-}: ProductDetailPageProps) {
-  // Xử lý ID từ format "product-1" hoặc "1"
-  const rawId = params.productId.replace("product-", "");
-  const productId = parseInt(rawId, 10);
-
-  if (isNaN(productId)) {
+}: {
+  params: { productId: string };
+}) {
+  // Kiểm tra xem params có tồn tại không để tránh sập server
+  if (!params || !params.productId) {
     notFound();
   }
 
-  const product = await getProductById(productId);
+  const product = await getProductById(params.productId);
 
   if (!product) {
     notFound();
@@ -53,7 +50,6 @@ export default async function ProductDetailPage({
             <FiChevronLeft className="mr-2" />
             Quay lại tất cả sản phẩm
           </Link>
-
           <ProductDetailClient product={product} />
         </div>
       </main>
