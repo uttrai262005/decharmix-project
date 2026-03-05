@@ -220,7 +220,7 @@ const getGiftBoxAssets = async (req, res) => {
 
     const { rows } = await pool.query(
       "SELECT id AS product_id, name, price, discount_price, image_url, category FROM products WHERE category = ANY($1)",
-      [categories]
+      [categories],
     );
     // Phân loại sản phẩm về 4 mảng
     const assets = {
@@ -249,7 +249,7 @@ const createProduct = async (req, res) => {
       `INSERT INTO products (name, price, category, stock_quantity) 
        VALUES ($1, $2, $3, 0) 
        RETURNING *`,
-      [name, price, category]
+      [name, price, category],
     );
 
     res.status(201).json(result.rows[0]);
@@ -298,7 +298,7 @@ const updateProduct = async (req, res) => {
         image_url,
         tags,
         id,
-      ]
+      ],
     );
 
     if (result.rows.length === 0) {
@@ -321,7 +321,7 @@ const deleteProduct = async (req, res) => {
     // (Tạm thời chúng ta sẽ xóa trực tiếp)
     const result = await pool.query(
       "DELETE FROM products WHERE id = $1 RETURNING *",
-      [id]
+      [id],
     );
 
     if (result.rows.length === 0) {
@@ -336,51 +336,7 @@ const deleteProduct = async (req, res) => {
       .json({ error: "Lỗi server (Có thể sản phẩm dính khóa ngoại)" });
   }
 };
-const getRelatedProducts = async (req, res) => {
-  const { id } = req.params;
 
-  try {
-    // BƯỚC 1: Lấy vector của sản phẩm hiện tại
-    const productRes = await pool.query(
-      "SELECT image_vector, category FROM products WHERE id = $1",
-      [id]
-    );
-
-    if (productRes.rows.length === 0) {
-      return res.status(404).json({ error: "Product not found" });
-    }
-
-    const { image_vector, category } = productRes.rows[0];
-
-    // BƯỚC 2: Kiểm tra xem sản phẩm có vector chưa
-    if (!image_vector) {
-      const fallbackQuery = `
-        SELECT * FROM products 
-        WHERE id != $1 AND category = $2 
-        LIMIT 5
-      `;
-      const fallbackRes = await pool.query(fallbackQuery, [id, category]);
-      return res.json(fallbackRes.rows);
-    }
-
-    const query = `
-      SELECT 
-        id, name, image_url, price, discount_price, category,
-        (image_vector <=> $2) as distance -- Tính khoảng cách Cosine
-      FROM products
-      WHERE id != $1 AND image_vector IS NOT NULL
-      ORDER BY distance ASC -- Khoảng cách càng nhỏ => Độ giống (Similarity) càng cao
-      LIMIT 5;
-    `;
-
-    const relatedRes = await pool.query(query, [id, image_vector]);
-
-    res.json(relatedRes.rows);
-  } catch (error) {
-    console.error("Lỗi Related Products AI:", error.message);
-    res.status(500).json({ error: "Server Error" });
-  }
-};
 const getAlsoBoughtProducts = async (req, res) => {
   const { id } = req.params;
 
@@ -468,7 +424,7 @@ async function loadImage(filePath) {
   } catch (error) {
     console.error(
       `[Lỗi] Không thể đọc file ảnh (JS): ${filePath}`,
-      error.message
+      error.message,
     );
     return null;
   }
@@ -483,7 +439,7 @@ async function getVector(imageTensor) {
   } catch (error) {
     console.error(
       "  [Lỗi] AI không thể suy luận (hoặc model chưa được tải):",
-      error.message
+      error.message,
     );
     return null;
   }
@@ -563,7 +519,7 @@ const getForYouRecommendations = async (req, res) => {
     // 1. Lấy "Vector" của user
     const { rows } = await pool.query(
       "SELECT taste_vector FROM users WHERE id = $1",
-      [userId]
+      [userId],
     );
 
     const userVectorString = rows[0]?.taste_vector;
@@ -571,7 +527,7 @@ const getForYouRecommendations = async (req, res) => {
     // Nếu user chưa có, trả về sản phẩm mới nhất
     if (!userVectorString) {
       const { rows: newProducts } = await pool.query(
-        "SELECT * FROM products ORDER BY created_at DESC LIMIT 10"
+        "SELECT * FROM products ORDER BY created_at DESC LIMIT 10",
       );
       return res.json(newProducts);
     }
@@ -592,6 +548,52 @@ const getForYouRecommendations = async (req, res) => {
   } catch (error) {
     console.error("Lỗi API 'For You':", error.message);
     res.status(500).json({ error: "Lỗi server" });
+  }
+};
+
+const getRelatedProducts = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // BƯỚC 1: Lấy vector của sản phẩm hiện tại
+    const productRes = await pool.query(
+      "SELECT image_vector, category FROM products WHERE id = $1",
+      [id],
+    );
+
+    if (productRes.rows.length === 0) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    const { image_vector, category } = productRes.rows[0];
+
+    // BƯỚC 2: Kiểm tra xem sản phẩm có vector chưa
+    if (!image_vector) {
+      const fallbackQuery = `
+        SELECT * FROM products 
+        WHERE id != $1 AND category = $2 
+        LIMIT 5
+      `;
+      const fallbackRes = await pool.query(fallbackQuery, [id, category]);
+      return res.json(fallbackRes.rows);
+    }
+
+    const query = `
+      SELECT 
+        id, name, image_url, price, discount_price, category,
+        (image_vector <=> $2) as distance -- Tính khoảng cách Cosine
+      FROM products
+      WHERE id != $1 AND image_vector IS NOT NULL
+      ORDER BY distance ASC -- Khoảng cách càng nhỏ => Độ giống (Similarity) càng cao
+      LIMIT 5;
+    `;
+
+    const relatedRes = await pool.query(query, [id, image_vector]);
+
+    res.json(relatedRes.rows);
+  } catch (error) {
+    console.error("Lỗi Related Products AI:", error.message);
+    res.status(500).json({ error: "Server Error" });
   }
 };
 module.exports = {

@@ -47,7 +47,7 @@ const ProductCard = ({ product }: { product: Product }) => {
 
   const calculateDiscountPercent = (
     originalPrice: number,
-    discountPrice: number
+    discountPrice: number,
   ) => {
     if (!discountPrice || discountPrice >= originalPrice) return 0;
     const discount = ((originalPrice - discountPrice) / originalPrice) * 100;
@@ -57,7 +57,7 @@ const ProductCard = ({ product }: { product: Product }) => {
   const discountPercent = product.discount_price
     ? calculateDiscountPercent(
         Number(product.price),
-        Number(product.discount_price)
+        Number(product.discount_price),
       )
     : 0;
 
@@ -119,7 +119,6 @@ const ProductCard = ({ product }: { product: Product }) => {
         <div className={styles.productContent}>
           <p className={styles.productCategory}>{product.category}</p>
           <h3 className={styles.productName}>{product.name}</h3>
-
           <div className={styles.priceContainer}>
             {product.discount_price &&
             Number(product.discount_price) < Number(product.price) ? (
@@ -220,25 +219,25 @@ export default function ProductsPage() {
 
     result = result
       .filter(
-        (p) => filters.category === "TẤT CẢ" || p.category === filters.category
+        (p) => filters.category === "TẤT CẢ" || p.category === filters.category,
       )
       .filter(
         (p) =>
           (p.discount_price || p.price) >= filters.priceRange[0] &&
-          (p.discount_price || p.price) <= filters.priceRange[1]
+          (p.discount_price || p.price) <= filters.priceRange[1],
       );
 
     switch (filters.sortBy) {
       case "Giá: Thấp đến cao":
         result.sort(
           (a, b) =>
-            (a.discount_price || a.price) - (b.discount_price || b.price)
+            (a.discount_price || a.price) - (b.discount_price || b.price),
         );
         break;
       case "Giá: Cao đến thấp":
         result.sort(
           (a, b) =>
-            (b.discount_price || b.price) - (a.discount_price || a.price)
+            (b.discount_price || b.price) - (a.discount_price || a.price),
         );
         break;
       case "Đánh giá cao":
@@ -252,11 +251,11 @@ export default function ProductsPage() {
   }, [products, filters]);
 
   const totalPages = Math.ceil(
-    filteredAndSortedProducts.length / productsPerPage
+    filteredAndSortedProducts.length / productsPerPage,
   );
   const paginatedProducts = filteredAndSortedProducts.slice(
     (currentPage - 1) * productsPerPage,
-    currentPage * productsPerPage
+    currentPage * productsPerPage,
   );
 
   if (loading) {
