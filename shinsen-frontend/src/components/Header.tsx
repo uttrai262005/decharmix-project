@@ -50,7 +50,7 @@ const HighlightMatch = ({
           </strong>
         ) : (
           part
-        )
+        ),
       )}
     </span>
   );

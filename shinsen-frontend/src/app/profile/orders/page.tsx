@@ -12,29 +12,6 @@ const rawUrl =
   process.env.NEXT_PUBLIC_API_URL || "https://shinsen-backend-api.onrender.com";
 const API_URL = rawUrl.endsWith("/") ? rawUrl.slice(0, -1) : rawUrl;
 
-// Interface đã cập nhật
-interface OrderItem {
-  name: string;
-  quantity: number;
-  price: number;
-  image_url: string[] | string | null; // Có thể Backend trả về mảng hoặc chuỗi
-}
-
-interface Order {
-  id: number;
-  order_code: string;
-  total_price: number;
-  status: string;
-  created_at: string;
-  items: OrderItem[] | string; // Đề phòng Backend trả items dưới dạng JSON string
-}
-
-// BỘ DỊCH GIỐNG ADMIN
-interface OrderResponse {
-  orders: Order[];
-  totalPages: number;
-  currentPage: number;
-}
 const TABS = [
   "Tất cả",
   "Chờ xác nhận",
@@ -55,7 +32,7 @@ const STATUS_MAP: { [key: string]: string } = {
 
 export default function OrdersPage() {
   const [activeTab, setActiveTab] = useState("Tất cả");
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { token } = useAuth();
 
@@ -69,7 +46,6 @@ export default function OrdersPage() {
       setIsLoading(true);
       try {
         const status = STATUS_MAP[activeTab] || "Tất cả";
-        // Gắn API_URL vào đường dẫn gọi fetch
         const response = await fetch(
           `${API_URL}/api/orders?status=${encodeURIComponent(status)}`,
           {
@@ -81,13 +57,15 @@ export default function OrdersPage() {
           throw new Error("Không thể tải đơn hàng");
         }
 
-        const data: OrderResponse = await response.json();
+        const data = await response.json();
 
-        // Đảm bảo data là một mảng hợp lệ
+        // Console log để Trúc có thể xem cấu trúc thật sự nếu cần (F12 -> Console)
+        console.log("Dữ liệu đơn hàng từ Backend:", data);
+
         if (data && Array.isArray(data.orders)) {
           setOrders(data.orders);
         } else if (Array.isArray(data)) {
-          setOrders(data); // Đề phòng API trả thẳng mảng
+          setOrders(data);
         } else {
           setOrders([]);
         }
@@ -145,50 +123,48 @@ export default function OrdersPage() {
     }
   };
 
-  // Hàm xử lý ảnh an toàn hơn, phòng trường hợp Backend trả về chuỗi JSON
+  // Hàm xử lý ảnh an toàn tuyệt đối
   const getFirstImage = (imageUrl: any) => {
     if (!imageUrl) return "/placeholder.png";
-
     try {
-      // Nếu nó là mảng thực sự
       if (Array.isArray(imageUrl) && imageUrl.length > 0) {
-        const first = imageUrl[0].trim();
+        const first = String(imageUrl[0]).trim();
         return first.startsWith("http") || first.startsWith("/")
           ? first
           : "/placeholder.png";
       }
-
-      // Nếu Backend lưu mảng dưới dạng chuỗi (ví dụ: '["https://..."]')
       if (typeof imageUrl === "string") {
-        // Thử parse xem có phải JSON không
         if (imageUrl.startsWith("[")) {
           const parsed = JSON.parse(imageUrl);
           if (Array.isArray(parsed) && parsed.length > 0) return parsed[0];
         }
-        // Nếu chỉ là link ảnh bình thường
         if (imageUrl.startsWith("http") || imageUrl.startsWith("/")) {
           return imageUrl;
         }
       }
-    } catch (e) {
-      console.error("Lỗi parse ảnh:", e);
-    }
+    } catch (e) {}
     return "/placeholder.png";
   };
 
-  // Hàm parse items an toàn, phòng trường hợp Backend lưu JSON string
-  const getOrderItems = (items: any): OrderItem[] => {
-    if (!items) return [];
-    if (Array.isArray(items)) return items;
+  // === HÀM BẮT LỖI TÌM KIẾM ĐỒ ĐẠC SIÊU CẤP ===
+  const getOrderItems = (order: any): any[] => {
+    // Dò tìm ở tất cả các tên biến mà Backend có thể trả về
+    let items =
+      order.items ||
+      order.order_items ||
+      order.OrderItems ||
+      order.products ||
+      [];
+
+    // Nếu Backend lưu chuỗi JSON
     if (typeof items === "string") {
       try {
-        return JSON.parse(items);
+        items = JSON.parse(items);
       } catch (e) {
-        console.error("Lỗi parse items:", e);
         return [];
       }
     }
-    return [];
+    return Array.isArray(items) ? items : [];
   };
 
   return (
@@ -214,7 +190,8 @@ export default function OrdersPage() {
           </p>
         ) : (
           orders.map((order) => {
-            const safeItems = getOrderItems(order.items);
+            const safeItems = getOrderItems(order);
+
             return (
               <div key={order.id} className={styles.orderCard}>
                 <div className={styles.orderHeader}>
@@ -229,31 +206,51 @@ export default function OrdersPage() {
 
                 <div className={styles.orderBody}>
                   {safeItems.length > 0 ? (
-                    safeItems.map((item, index) => (
-                      <div key={index} className={styles.orderItem}>
-                        <div className={styles.itemImage}>
-                          <Image
-                            src={getFirstImage(item.image_url)}
-                            alt={item.name || "Sản phẩm"}
-                            width={70}
-                            height={70}
-                            style={{ objectFit: "cover" }}
-                          />
+                    safeItems.map((item, index) => {
+                      // Dò tìm tên, giá và ảnh ở nhiều cấu trúc lồng nhau khác nhau
+                      const itemName =
+                        item.name ||
+                        item.product_name ||
+                        item.product?.name ||
+                        "Sản phẩm";
+                      const itemPrice =
+                        item.price ||
+                        item.unit_price ||
+                        item.product?.price ||
+                        0;
+                      const itemQuantity = item.quantity || 1;
+                      const itemImage =
+                        item.image_url ||
+                        item.product?.image_url ||
+                        item.image ||
+                        null;
+
+                      return (
+                        <div key={index} className={styles.orderItem}>
+                          <div className={styles.itemImage}>
+                            <Image
+                              src={getFirstImage(itemImage)}
+                              alt={itemName}
+                              width={70}
+                              height={70}
+                              style={{ objectFit: "cover" }}
+                            />
+                          </div>
+                          <div className={styles.itemInfo}>
+                            <p className={styles.itemName}>{itemName}</p>
+                            <p className={styles.itemQuantity}>
+                              x {itemQuantity}
+                            </p>
+                          </div>
+                          <div className={styles.itemPrice}>
+                            {Number(itemPrice).toLocaleString("vi-VN")} ₫
+                          </div>
                         </div>
-                        <div className={styles.itemInfo}>
-                          <p className={styles.itemName}>{item.name}</p>
-                          <p className={styles.itemQuantity}>
-                            x {item.quantity}
-                          </p>
-                        </div>
-                        <div className={styles.itemPrice}>
-                          {Number(item.price).toLocaleString("vi-VN")} ₫
-                        </div>
-                      </div>
-                    ))
+                      );
+                    })
                   ) : (
                     <p style={{ padding: "10px", color: "#888" }}>
-                      Không có thông tin sản phẩm.
+                      Đang tải thông tin sản phẩm...
                     </p>
                   )}
                 </div>
@@ -266,7 +263,10 @@ export default function OrdersPage() {
                   <p>
                     Thành tiền:{" "}
                     <strong>
-                      {Number(order.total_price).toLocaleString("vi-VN")} ₫
+                      {Number(
+                        order.total_price || order.total || 0,
+                      ).toLocaleString("vi-VN")}{" "}
+                      ₫
                     </strong>
                   </p>
                 </div>
