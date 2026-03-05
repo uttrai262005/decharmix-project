@@ -1,41 +1,37 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { FiHeart, FiPackage, FiAward, FiArrowRight } from "react-icons/fi";
+import { FiHeart, FiPackage, FiAward } from "react-icons/fi";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination, EffectFade } from "swiper/modules";
 import { useAuth } from "@/contexts/AuthContext";
-// Import CSS Module mới
 import styles from "./Home.module.css";
 
 // Import Swiper styles
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/effect-fade";
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
-// --- Định nghĩa kiểu dữ liệu (Interfaces) ---
+
+// --- XỬ LÝ URL AN TOÀN TUYỆT ĐỐI ---
+const rawUrl =
+  process.env.NEXT_PUBLIC_API_URL || "https://shinsen-backend-api.onrender.com";
+const API_URL = rawUrl.endsWith("/") ? rawUrl.slice(0, -1) : rawUrl;
+
+// --- Interfaces ---
 interface Product {
   id: number;
   name: string;
   price: number;
   image_url: string[] | null;
   discount_price?: number;
-  // API của deal hot cần trả về end_date
   end_date?: string;
+  category?: string;
 }
 
-interface BlogPost {
-  id: number;
-  title: string;
-  category: string;
-  image_url: string; // Giả sử API blog trả về 1 ảnh
-  href: string; // Hoặc 'slug'
-}
-
-// --- Component Card Sản phẩm (dùng nội bộ) ---
+// --- Component Card Sản phẩm ---
 const ProductCard = ({
   product,
   index,
@@ -46,7 +42,7 @@ const ProductCard = ({
   const displayPrice = product.discount_price || product.price;
   const firstImage =
     product.image_url && product.image_url.length > 0
-      ? product.image_url[0].trimEnd() // Lọc link rác
+      ? product.image_url[0].trim()
       : "/placeholder.png";
 
   const isValidUrl =
@@ -55,10 +51,10 @@ const ProductCard = ({
   return (
     <motion.div
       className={styles.productCard}
-      initial={{ opacity: 0, y: 50 }}
+      initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.3 }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, delay: index * 0.05 }}
     >
       <div className={styles.productImageWrapper}>
         <Link href={`/products/product-${product.id}`}>
@@ -68,17 +64,19 @@ const ProductCard = ({
             fill
             style={{ objectFit: "cover" }}
             className={styles.productImage}
-            sizes="(max-width: 768px) 100vw, 50vw"
+            sizes="(max-width: 768px) 50vw, 25vw"
           />
         </Link>
       </div>
       <div className={styles.productContent}>
         <h3 className={styles.productName}>{product.name}</h3>
         <p className={styles.productPrice}>
-          {displayPrice.toLocaleString("vi-VN")} ₫
-          {product.discount_price && (
+          <span className={styles.currentPrice}>
+            {Number(displayPrice).toLocaleString("vi-VN")} ₫
+          </span>
+          {product.discount_price && product.discount_price < product.price && (
             <span className={styles.originalPrice}>
-              {product.price.toLocaleString("vi-VN")} ₫
+              {Number(product.price).toLocaleString("vi-VN")} ₫
             </span>
           )}
         </p>
@@ -93,78 +91,56 @@ const ProductCard = ({
   );
 };
 
-// --- Component Đếm ngược (Giữ lại từ code cũ của bạn) ---
+// --- Component Đếm ngược ---
 const CountdownTimer = ({ endDate }: { endDate: Date }) => {
-  const [isClient, setIsClient] = useState(false);
-  useEffect(() => setIsClient(true), []);
-
-  const calculateTimeLeft = () => {
-    const difference = +endDate - +new Date();
-    if (difference <= 0) return { hours: 0, minutes: 0, seconds: 0 };
-    return {
-      hours: Math.floor(difference / (1000 * 60 * 60)),
-      minutes: Math.floor((difference / 1000 / 60) % 60),
-      seconds: Math.floor((difference / 1000) % 60),
-    };
-  };
-
-  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
+  const [timeLeft, setTimeLeft] = useState({
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
 
   useEffect(() => {
-    if (!isClient) return;
-    const timer = setTimeout(() => setTimeLeft(calculateTimeLeft()), 1000);
-    return () => clearTimeout(timer);
-  }, [isClient, timeLeft]);
-
-  if (!isClient) {
-    return (
-      <div className={styles.countdownTimer}>
-        <div className={styles.timeBlock}>
-          <span>--</span>
-          <span>Giờ</span>
-        </div>
-        <div className={styles.timeBlock}>
-          <span>--</span>
-          <span>Phút</span>
-        </div>
-        <div className={styles.timeBlock}>
-          <span>--</span>
-          <span>Giây</span>
-        </div>
-      </div>
-    );
-  }
+    const timerFunc = setInterval(() => {
+      const difference = +endDate - +new Date();
+      if (difference <= 0) {
+        clearInterval(timerFunc);
+      } else {
+        setTimeLeft({
+          hours: Math.floor(difference / (1000 * 60 * 60)),
+          minutes: Math.floor((difference / 1000 / 60) % 60),
+          seconds: Math.floor((difference / 1000) % 60),
+        });
+      }
+    }, 1000);
+    return () => clearInterval(timerFunc);
+  }, [endDate]);
 
   return (
     <div className={styles.countdownTimer}>
       <div className={styles.timeBlock}>
         <span>{String(timeLeft.hours).padStart(2, "0")}</span>
-        <span>Giờ</span>
+        <small>Giờ</small>
       </div>
       <div className={styles.timeBlock}>
         <span>{String(timeLeft.minutes).padStart(2, "0")}</span>
-        <span>Phút</span>
+        <small>Phút</small>
       </div>
       <div className={styles.timeBlock}>
         <span>{String(timeLeft.seconds).padStart(2, "0")}</span>
-        <span>Giây</span>
+        <small>Giây</small>
       </div>
     </div>
   );
 };
 
-// --- COMPONENT CHÍNH TRANG CHỦ ---
 export default function HomePage() {
   const { isAuthenticated, token } = useAuth();
   const [forYouProducts, setForYouProducts] = useState<Product[]>([]);
-  // === DỮ LIỆU ĐỘNG TỪ API ===
   const [newProducts, setNewProducts] = useState<Product[]>([]);
   const [bestSellers, setBestSellers] = useState<Product[]>([]);
   const [dealProduct, setDealProduct] = useState<Product | null>(null);
-  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // === DỮ LIỆU TĨNH ===
   const heroSlides = [
     {
       imageUrl: "/hero-handmade-1.jpg",
@@ -204,217 +180,180 @@ export default function HomePage() {
     },
   ];
 
-  // === DỮ LIỆU MỚI: KHU VỰC GAME ===
   const gameHub = [
     {
       title: "Vòng Quay May Mắn",
-      description: "Quay liền tay, rinh ngay Xu và voucher giảm giá!",
-      imageUrl: "/33.png", // <-- Bạn cần tạo ảnh này
+      description: "Quay liền tay, rinh ngay Xu!",
+      imageUrl: "/33.png",
       href: "/game/lucky-wheel",
     },
     {
       title: "Đập Hộp Quà",
-      description: "Mở hộp quà bí ẩn, 100% trúng thưởng độc quyền.",
-      imageUrl: "/34.png", // <-- Bạn cần tạo ảnh này
+      description: "Mở hộp quà bí ẩn, 100% trúng thưởng.",
+      imageUrl: "/34.png",
       href: "/game/gift-box",
     },
     {
-      title: "Lật Hình Trí Nhớ", // <-- Đổi tên
-      description: "Thử thách trí nhớ, thắng game trong 60s nhận thưởng!", // <-- Đổi mô tả
-      imageUrl: "/35.png", // <-- Tạo ảnh banner mới
-      href: "/game/memory-match", // <-- SỬA Ở ĐÂY
+      title: "Lật Hình Trí Nhớ",
+      description: "Thắng game nhận thưởng!",
+      imageUrl: "/35.png",
+      href: "/game/memory-match",
     },
     {
-      title: "Săn Charm Nhanh Tay",
-      description: "Click 15 charm trong 30s. Cẩn thận bom!",
-      imageUrl: "/36.png", // <-- Tạo ảnh banner mới
+      title: "Săn Charm",
+      description: "Nhanh tay click, né bom!",
+      imageUrl: "/36.png",
       href: "/game/whac-a-charm",
     },
     {
-      title: "Charm Nhảy Vượt Ải",
-      description: "Né bom, ăn 10 xu trong 45 giây để thắng!",
-      imageUrl: "/37.png", // <-- Tạo ảnh banner mới
+      title: "Charm Nhảy",
+      description: "Vượt ải nhận xu thưởng!",
+      imageUrl: "/37.png",
       href: "/game/charm-jump",
     },
     {
-      title: "Chém Charm Né Bom",
-      description: "Chém 20 charm. Đừng chém bom hoặc để lỡ 3 charm!",
-      imageUrl: "/38.png", // <-- Tạo ảnh banner mới
+      title: "Chém Charm",
+      description: "Cắt hoa né bom cực đã!",
+      imageUrl: "/38.png",
       href: "/game/charm-slice",
     },
   ];
-  // =================================
 
-  // === GỌI API KHI TẢI TRANG ===
+  // Fetch dữ liệu công khai (New, Bestseller, Deal)
   useEffect(() => {
-    const fetchPublicData = async () => {
+    const fetchData = async () => {
+      setIsLoading(true);
       try {
-        setIsLoading(true);
-        // (Chạy API công khai song song)
-        const [newRes, bestRes, dealRes, blogRes] = await Promise.all([
+        const [newRes, bestRes, dealRes] = await Promise.all([
           fetch(`${API_URL}/api/products?filter=new&limit=4`),
           fetch(`${API_URL}/api/products?filter=bestseller&limit=4`),
           fetch(`${API_URL}/api/products/deal-of-the-day`),
-          fetch(`${API_URL}/api/blog?limit=3`),
         ]);
 
-        if (newRes.ok) setNewProducts((await newRes.json()).products || []);
-        if (bestRes.ok) setBestSellers((await bestRes.json()).products || []);
-        if (dealRes.ok) setDealProduct(await dealRes.json());
-        if (blogRes.ok) setBlogPosts(await blogRes.json());
+        if (newRes.ok) {
+          const d = await newRes.json();
+          setNewProducts(
+            Array.isArray(d.products) ? d.products : Array.isArray(d) ? d : [],
+          );
+        }
+        if (bestRes.ok) {
+          const d = await bestRes.json();
+          setBestSellers(
+            Array.isArray(d.products) ? d.products : Array.isArray(d) ? d : [],
+          );
+        }
+        if (dealRes.ok) {
+          const d = await dealRes.json();
+          setDealProduct(d);
+        }
       } catch (error) {
-        console.error("Lỗi khi tải dữ liệu trang chủ (công khai):", error);
+        console.error("Lỗi fetch trang chủ:", error);
       } finally {
         setIsLoading(false);
       }
     };
-    fetchPublicData();
-  }, []); // (Chỉ chạy 1 lần)
+    fetchData();
+  }, []);
 
-  // (useEffect 2: Tải dữ liệu AI "FOR YOU" nếu đã đăng nhập)
+  // Fetch dữ liệu cá nhân hóa (For You)
   useEffect(() => {
-    const fetchForYouData = async () => {
-      // (Chỉ chạy nếu user đã đăng nhập VÀ có token)
-      if (isAuthenticated && token) {
-        try {
-          const res = await fetch(`${API_URL}/api/products/for-you`, {
-            headers: {
-              Authorization: `Bearer ${token}`, // (Gửi token xác thực)
-            },
-          });
-          if (res.ok) {
-            const data = await res.json();
-            setForYouProducts(data || []);
-          }
-        } catch (error) {
-          console.error("Lỗi khi tải gợi ý 'For You':", error);
-        }
-      }
-    };
-    fetchForYouData();
-  }, [isAuthenticated, token]); // (Chạy lại khi trạng thái đăng nhập thay đổi)
+    if (isAuthenticated && token) {
+      fetch(`${API_URL}/api/products/for-you`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((res) => res.json())
+        .then((data) => setForYouProducts(Array.isArray(data) ? data : []))
+        .catch((err) => console.error("Lỗi fetch For You:", err));
+    }
+  }, [isAuthenticated, token]);
 
   return (
     <div className={styles.pageWrapper}>
       <main>
-        {/* ===== 1. HERO SLIDER (3 Banner) ===== */}
+        {/* SECTION 1: HERO SLIDER */}
         <section className={styles.heroSection}>
           <Swiper
             modules={[Autoplay, Pagination, EffectFade]}
             effect="fade"
-            loop={true}
-            autoplay={{ delay: 3500, disableOnInteraction: false }}
+            loop
+            autoplay={{ delay: 3500 }}
             pagination={{ clickable: true }}
             className={styles.heroSwiper}
           >
-            {heroSlides.map((slide, index) => (
-              <SwiperSlide key={index}>
+            {heroSlides.map((slide, i) => (
+              <SwiperSlide key={i}>
                 <div className={styles.slideContent}>
                   <div
                     className={styles.slideBackground}
                     style={{ backgroundImage: `url(${slide.imageUrl})` }}
                   />
                   <div className={styles.slideOverlay} />
-                  <motion.div
-                    className={styles.slideText}
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.3 }}
-                  >
+                  <div className={styles.slideText}>
                     <h1 className={styles.slideTitle}>{slide.title}</h1>
                     <p className={styles.slideSubtitle}>{slide.subtitle}</p>
                     <Link href={slide.href} className={styles.slideButton}>
                       Khám Phá Ngay
                     </Link>
-                  </motion.div>
+                  </div>
                 </div>
               </SwiperSlide>
             ))}
           </Swiper>
         </section>
 
-        {/* ===== 2. CAM KẾT THƯƠNG HIỆU ===== */}
+        {/* SECTION 2: COMMITMENTS */}
         <section className={`${styles.container} ${styles.commitmentsSection}`}>
           <div className={styles.commitmentsGrid}>
-            <motion.div
-              className={styles.commitmentItem}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-            >
+            <div className={styles.commitmentItem}>
               <FiHeart className={styles.commitmentIcon} />
-              <h3 className={styles.commitmentTitle}>Thiết Kế Độc Quyền</h3>
-              <p>Sản phẩm được làm thủ công với tình yêu và sự tỉ mỉ.</p>
-            </motion.div>
-            <motion.div
-              className={styles.commitmentItem}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
+              <h3>Thiết Kế Độc Quyền</h3>
+              <p>Làm thủ công với tình yêu</p>
+            </div>
+            <div className={styles.commitmentItem}>
               <FiAward className={styles.commitmentIcon} />
-              <h3 className={styles.commitmentTitle}>Chất Liệu Cao Cấp</h3>
-              <p>Chỉ sử dụng vật liệu an toàn, bền đẹp theo thời gian.</p>
-            </motion.div>
-            <motion.div
-              className={styles.commitmentItem}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-            >
+              <h3>Chất Liệu Cao Cấp</h3>
+              <p>Bền đẹp theo thời gian</p>
+            </div>
+            <div className={styles.commitmentItem}>
               <FiPackage className={styles.commitmentIcon} />
-              <h3 className={styles.commitmentTitle}>Gói Quà Miễn Phí</h3>
-              <p>Mỗi đơn hàng đều được gói cẩn thận như một món quà.</p>
-            </motion.div>
+              <h3>Gói Quà Miễn Phí</h3>
+              <p>Chăm chút từng đơn hàng</p>
+            </div>
           </div>
         </section>
 
-        {/* ===== 3. DANH MỤC NỔI BẬT ===== */}
+        {/* SECTION 3: CATEGORIES */}
         <section className={`${styles.container} ${styles.section}`}>
           <div className={styles.categoryGrid}>
-            {categories.map((cat, index) => (
-              <motion.div
+            {categories.map((cat) => (
+              <Link
+                href={cat.href}
                 key={cat.name}
                 className={styles.categoryCard}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <Link href={cat.href}>
-                  <Image
-                    src={cat.imageUrl}
-                    alt={cat.name}
-                    width={400}
-                    height={500}
-                    style={{ objectFit: "cover" }}
-                    className={styles.categoryImage}
-                  />
-                  <div className={styles.categoryOverlay}>
-                    <h3 className={styles.categoryName}>{cat.name}</h3>
-                    <span className={styles.categoryButton}>Xem Ngay</span>
-                  </div>
-                </Link>
-              </motion.div>
+                <Image
+                  src={cat.imageUrl}
+                  alt={cat.name}
+                  width={400}
+                  height={500}
+                  className={styles.categoryImage}
+                />
+                <div className={styles.categoryOverlay}>
+                  <h3>{cat.name}</h3>
+                </div>
+              </Link>
             ))}
           </div>
         </section>
 
-        {/* ===== 4. DEAL HOT TRONG TUẦN ===== */}
-        {isLoading && !dealProduct ? (
-          <div className={styles.loadingPlaceholder}>Đang tải ưu đãi...</div>
-        ) : dealProduct ? (
+        {/* SECTION 4: DEAL OF THE DAY */}
+        {dealProduct && (
           <section
             className={`${styles.container} ${styles.section} ${styles.bgPink}`}
           >
             <h2 className={styles.sectionTitle}>Ưu Đãi Đặc Biệt</h2>
             <div className={styles.dealGrid}>
-              <motion.div
-                className={styles.dealImageWrapper}
-                initial={{ opacity: 0, x: -50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, amount: 0.5 }}
-              >
+              <div className={styles.dealImageWrapper}>
                 <Image
                   src={
                     (dealProduct.image_url && dealProduct.image_url[0]) ||
@@ -423,137 +362,115 @@ export default function HomePage() {
                   alt={dealProduct.name}
                   fill
                   style={{ objectFit: "cover" }}
-                  sizes="50vw"
                 />
-              </motion.div>
-              <motion.div
-                className={styles.dealContent}
-                initial={{ opacity: 0, x: 50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, amount: 0.5 }}
-              >
+              </div>
+              <div className={styles.dealContent}>
                 <h2 className={styles.dealTitle}>{dealProduct.name}</h2>
                 <div className={styles.dealPrices}>
                   <span className={styles.dealSalePrice}>
-                    {dealProduct.discount_price?.toLocaleString("vi-VN")} ₫
+                    {Number(dealProduct.discount_price).toLocaleString()} ₫
                   </span>
                   <span className={styles.dealOriginalPrice}>
-                    {dealProduct.price.toLocaleString("vi-VN")} ₫
+                    {Number(dealProduct.price).toLocaleString()} ₫
                   </span>
                 </div>
-                <div className={styles.countdownWrapper}>
-                  <p>Ưu đãi kết thúc sau:</p>
-                  <CountdownTimer
-                    endDate={
-                      new Date(dealProduct.end_date || Date.now() + 86400000)
-                    }
-                  />
-                </div>
+                <CountdownTimer
+                  endDate={
+                    new Date(dealProduct.end_date || Date.now() + 86400000)
+                  }
+                />
                 <Link
                   href={`/products/product-${dealProduct.id}`}
                   className={styles.dealButton}
                 >
                   Săn Deal Ngay
                 </Link>
-              </motion.div>
+              </div>
             </div>
           </section>
-        ) : null}
+        )}
 
-        {/* ===== 5. GÓC SĂN THƯỞNG (TRÒ CHƠI) - MỚI ===== */}
+        {/* SECTION 5: GAME HUB */}
         <section className={`${styles.container} ${styles.section}`}>
           <h2 className={styles.sectionTitle}>Góc Săn Thưởng</h2>
           <div className={styles.gameGrid}>
-            {gameHub.map((game, index) => (
-              <motion.div
-                key={index}
-                className={styles.gameCard}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
+            {gameHub.map((game, i) => (
+              <div key={i} className={styles.gameCard}>
                 <div className={styles.gameImageWrapper}>
                   <Image
                     src={game.imageUrl}
                     alt={game.title}
                     fill
                     style={{ objectFit: "cover" }}
-                    className={styles.gameImage}
-                    sizes="(max-width: 768px) 100vw, 50vw"
                   />
                 </div>
                 <div className={styles.gameContent}>
-                  <h3 className={styles.gameTitle}>{game.title}</h3>
-                  <p className={styles.gameDescription}>{game.description}</p>
-                  <Link
-                    href={game.href}
-                    className={`${styles.gameButton} ${
-                      game.href === "#" ? styles.gameButtonDisabled : ""
-                    }`}
-                  >
-                    {game.href === "#" ? "Sắp ra mắt" : "Chơi Ngay"}
+                  <h3>{game.title}</h3>
+                  <p>{game.description}</p>
+                  <Link href={game.href} className={styles.gameButton}>
+                    Chơi Ngay
                   </Link>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </section>
-        {/* =========================================== */}
+
+        {/* SECTION 6: FOR YOU (AI Recommendations) */}
         {isAuthenticated && forYouProducts.length > 0 && (
           <section
             className={`${styles.container} ${styles.section} ${styles.bgPink}`}
           >
             <h2 className={styles.sectionTitle}>✨ Dành Riêng Cho Bạn</h2>
             <div className={styles.productGrid}>
-              {forYouProducts.map((product, i) => (
-                <ProductCard key={product.id} product={product} index={i} />
+              {forYouProducts.map((p, i) => (
+                <ProductCard key={p.id} product={p} index={i} />
               ))}
             </div>
           </section>
         )}
 
-        {/* ===== 6. SẢN PHẨM MỚI VỀ ===== */}
+        {/* SECTION 7: NEW ARRIVALS */}
         <section className={`${styles.container} ${styles.section}`}>
           <h2 className={styles.sectionTitle}>Hàng Mới Về</h2>
-          {isLoading ? (
-            <div className={styles.loadingPlaceholder}>
-              Đang tải sản phẩm...
-            </div>
-          ) : (
-            <div className={styles.productGrid}>
-              {newProducts.map((product, i) => (
-                <ProductCard key={product.id} product={product} index={i} />
-              ))}
-            </div>
-          )}
+          <div className={styles.productGrid}>
+            {newProducts.length > 0 ? (
+              newProducts.map((p, i) => (
+                <ProductCard key={p.id} product={p} index={i} />
+              ))
+            ) : (
+              <div className={styles.emptyState}>
+                Đang cập nhật sản phẩm mới...
+              </div>
+            )}
+          </div>
         </section>
 
-        {/* ===== 8. SẢN PHẨM BÁN CHẠY ===== */}
+        {/* SECTION 8: BEST SELLERS */}
         <section className={`${styles.container} ${styles.section}`}>
           <h2 className={styles.sectionTitle}>Sản Phẩm Nổi Bật</h2>
-          {isLoading ? (
-            <div className={styles.loadingPlaceholder}>
-              Đang tải sản phẩm...
-            </div>
-          ) : (
-            <div className={styles.productGrid}>
-              {bestSellers.map((product, i) => (
-                <ProductCard key={product.id} product={product} index={i} />
-              ))}
-            </div>
-          )}
+          <div className={styles.productGrid}>
+            {bestSellers.length > 0 ? (
+              bestSellers.map((p, i) => (
+                <ProductCard key={p.id} product={p} index={i} />
+              ))
+            ) : (
+              <div className={styles.emptyState}>
+                Đang cập nhật sản phẩm nổi bật...
+              </div>
+            )}
+          </div>
         </section>
 
-        {/* ===== 9. NEWSLETTER ===== */}
+        {/* SECTION 9: NEWSLETTER */}
         <section className={`${styles.container} ${styles.section}`}>
           <div className={styles.newsletterSection}>
             <h2 className={styles.sectionTitle}>Nhận Ưu Đãi Đặc Biệt</h2>
-            <p>
-              Đăng ký email để nhận ngay voucher giảm giá 10% cho đơn hàng đầu
-              tiên.
-            </p>
-            <form className={styles.newsletterForm}>
+            <p>Đăng ký email để nhận ngay voucher giảm giá 10%.</p>
+            <form
+              className={styles.newsletterForm}
+              onSubmit={(e) => e.preventDefault()}
+            >
               <input type="email" placeholder="Email của bạn..." required />
               <button type="submit">Đăng ký</button>
             </form>
