@@ -1,173 +1,156 @@
 "use client";
 
-import { useState, useEffect } from "react";
-// 1. IMPORT DYNAMIC
+import { useState, useEffect, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useAuth } from "@/contexts/AuthContext";
 import styles from "./LuckyWheel.module.css";
 import { FiGift, FiDatabase } from "react-icons/fi";
-import { WheelData } from "react-custom-roulette/dist/components/Wheel/types";
+import { toast } from "react-hot-toast";
 
-// 2. TẢI ĐỘNG COMPONENT <Wheel> VỚI SSR: FALSE
+// TẢI ĐỘNG COMPONENT <Wheel> VỚI SSR: FALSE
 const Wheel = dynamic(
   () => import("react-custom-roulette").then((mod) => mod.Wheel),
-  { ssr: false }
+  { ssr: false },
 );
 
-// 3. Mảng này GIỜ CHỈ CÒN LƯU STYLE
-// (Bạn có thể thêm/bớt style nếu muốn, nó sẽ tự lặp lại)
+// XỬ LÝ URL AN TOÀN - TRIỆT TIÊU LỖI //
+const rawUrl =
+  process.env.NEXT_PUBLIC_API_URL || "https://shinsen-backend-api.onrender.com";
+const API_URL = rawUrl.endsWith("/") ? rawUrl.slice(0, -1) : rawUrl;
+
 const wheelStyles = [
   { style: { backgroundColor: "#fff5f9", textColor: "#be5985" } },
   { style: { backgroundColor: "#ffe2f2", textColor: "#7c596b" } },
 ];
 
 export default function LuckyWheelPage() {
-  const { user, token, refreshUserStats } = useAuth();
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const { user, token, refreshUserStats, isAuthenticated } = useAuth();
 
-  // 4. TẠO STATE MỚI CHO VÒNG QUAY
-  // WheelData là type từ thư viện
-  const [wheelData, setWheelData] = useState<Partial<WheelData>[]>([]);
+  const [wheelData, setWheelData] = useState<any[]>([]);
   const [isLoadingWheel, setIsLoadingWheel] = useState(true);
-
   const [mustSpin, setMustSpin] = useState(false);
   const [prizeNumber, setPrizeNumber] = useState(0);
   const [spinTickets, setSpinTickets] = useState(0);
   const [userCoins, setUserCoins] = useState(0);
   const [resultMessage, setResultMessage] = useState("");
 
-  // 5. TẢI DỮ LIỆU VÒNG QUAY KHI VÀO TRANG
-  useEffect(() => {
-    const fetchWheelPrizes = async () => {
-      if (!API_URL) {
-        setResultMessage("Lỗi: Không thể tải cấu hình server.");
-        return;
+  // Hàm tải dữ liệu vòng quay (prizes)
+  const fetchWheelPrizes = useCallback(async () => {
+    setIsLoadingWheel(true);
+    try {
+      const res = await fetch(`${API_URL}/api/games/wheel-prizes`);
+
+      const contentType = res.headers.get("content-type");
+      if (!res.ok || !contentType?.includes("application/json")) {
+        throw new Error("Không thể kết nối dữ liệu vòng quay.");
       }
-      setIsLoadingWheel(true);
-      try {
-        // Gọi API mới (đã thêm 's' -> /api/games)
-        const res = await fetch(`${API_URL}/api/games/wheel-prizes`);
-        if (!res.ok) throw new Error("Lỗi tải giải thưởng từ server");
 
-        const prizesFromDB: { name: string }[] = await res.json();
+      const prizesFromDB: { name: string }[] = await res.json();
+      const finalWheelData = prizesFromDB.map((prize, index) => ({
+        option: prize.name,
+        style: wheelStyles[index % wheelStyles.length].style,
+      }));
 
-        // Trộn data từ DB (name) với style (frontend)
-        const finalWheelData = prizesFromDB.map((prize, index) => ({
-          option: prize.name, // Lấy từ DB
-          style: wheelStyles[index % wheelStyles.length].style, // Lấy style từ mảng trên
-        }));
+      setWheelData(finalWheelData);
+    } catch (err: any) {
+      console.error("Lỗi tải vòng quay:", err);
+      setResultMessage("Máy chủ vòng quay đang khởi động, vui lòng đợi...");
+    } finally {
+      setIsLoadingWheel(false);
+    }
+  }, []);
 
-        setWheelData(finalWheelData);
-      } catch (err: any) {
-        console.error("Lỗi tải vòng quay:", err);
-        setResultMessage(err.message);
-      } finally {
-        setIsLoadingWheel(false);
-      }
-    };
-    fetchWheelPrizes();
-  }, [API_URL]); // Chỉ chạy 1 lần khi API_URL sẵn sàng
-
-  // 6. Tải stats của User (giữ nguyên)
-  const fetchStats = async () => {
-    if (!token || !API_URL) return;
+  // Tải stats của User
+  const fetchStats = useCallback(async () => {
+    if (!token) return;
     try {
       const res = await fetch(`${API_URL}/api/games/stats`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
         const data = await res.json();
-        setSpinTickets(data.spin_tickets);
-        setUserCoins(data.coins);
+        setSpinTickets(data.spin_tickets || 0);
+        setUserCoins(data.coins || 0);
       }
     } catch (err) {
       console.error(err);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
-    if (user) {
-      setUserCoins(user.coins);
-      setSpinTickets(user.spin_tickets || 0);
+    fetchWheelPrizes();
+  }, [fetchWheelPrizes]);
+
+  useEffect(() => {
+    if (isAuthenticated && token) {
       fetchStats();
     }
-  }, [user, token]);
+  }, [isAuthenticated, token, fetchStats]);
 
-  // 7. Hàm Quay (giữ nguyên)
   const handleSpinClick = async () => {
     if (spinTickets <= 0) {
-      setResultMessage("Bạn đã hết lượt quay.");
+      toast.error("Bạn đã hết lượt quay!");
       return;
     }
-    if (mustSpin) return;
-    if (!API_URL) {
-      setResultMessage("Lỗi kết nối. Vui lòng tải lại trang.");
-      return;
-    }
+    if (mustSpin || !token) return;
+
     setResultMessage("");
 
     try {
       const response = await fetch(`${API_URL}/api/games/spin`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Quay thất bại");
 
-      const newPrizeNumber = data.prize_index;
-      setPrizeNumber(newPrizeNumber);
+      setPrizeNumber(data.prize_index);
       setMustSpin(true);
+      // Giảm lượt quay ảo trên giao diện cho mượt
       setSpinTickets((prev) => prev - 1);
     } catch (error: any) {
       console.error(error);
-      setResultMessage(error.message);
+      toast.error(error.message);
       setMustSpin(false);
     }
   };
 
-  // 8. SỬA HÀM onStopSpinning (dùng state động)
   const onStopSpinning = async () => {
     setMustSpin(false);
-
-    // Lấy tên giải từ STATE (đã được tải từ DB), không hard-code nữa
     if (wheelData.length > 0) {
-      setResultMessage(
-        `Chúc mừng! Bạn đã trúng: ${wheelData[prizeNumber].option}`
-      );
+      const prizeName = wheelData[prizeNumber].option;
+      setResultMessage(`🎉 Chúc mừng! Bạn đã trúng: ${prizeName}`);
+      toast.success(`Trúng ${prizeName}!`);
     }
-
+    // Cập nhật lại ví tiền và số lượt từ server
     await refreshUserStats();
+    await fetchStats();
   };
 
-  // 9. THÊM TRẠNG THÁI LOADING
   if (isLoadingWheel) {
     return (
       <div className={styles.pageWrapper}>
         <div className={styles.container}>
           <h1 className={styles.title}>Đang tải vòng quay...</h1>
-          {resultMessage && (
-            <p className={styles.resultMessage}>{resultMessage}</p>
-          )}
         </div>
       </div>
     );
   }
 
-  // 10. Giao diện (đã cập nhật data={wheelData})
   return (
     <div className={styles.pageWrapper}>
       <div className={styles.container}>
         <h1 className={styles.title}>Vòng Quay May Mắn</h1>
-        <p className={styles.subtitle}>
-          Thử vận may để nhận Xu và Voucher độc quyền từ Decharmix!
-        </p>
+        <p className={styles.subtitle}>Thử vận may nhận Xu và Voucher!</p>
 
-        {/* Thông tin User */}
         <div className={styles.statsBar}>
           <div className={styles.statItem}>
             <FiDatabase />
-            <span>Decharmix Xu:</span>
+            <span>Xu:</span>
             <strong>{userCoins.toLocaleString("vi-VN")}</strong>
           </div>
           <div className={styles.statItem}>
@@ -177,33 +160,33 @@ export default function LuckyWheelPage() {
           </div>
         </div>
 
-        {/* Vòng quay */}
         <div className={styles.wheelContainer}>
-          <Wheel
-            mustStartSpinning={mustSpin}
-            prizeNumber={prizeNumber}
-            data={wheelData} // <-- SỬ DỤNG STATE ĐỘNG
-            outerBorderColor={"#ffe2f2"}
-            outerBorderWidth={10}
-            innerBorderColor={"#ffe2f2"}
-            innerBorderWidth={0}
-            radiusLineColor={"#ffe2f2"}
-            radiusLineWidth={5}
-            textColors={["#be5985"]}
-            fontSize={14}
-            fontWeight={600}
-            onStopSpinning={onStopSpinning}
-          />
+          {wheelData.length > 0 && (
+            <Wheel
+              mustStartSpinning={mustSpin}
+              prizeNumber={prizeNumber}
+              data={wheelData}
+              outerBorderColor={"#ffe2f2"}
+              outerBorderWidth={10}
+              innerBorderColor={"#ffe2f2"}
+              innerBorderWidth={0}
+              radiusLineColor={"#ffe2f2"}
+              radiusLineWidth={5}
+              textColors={["#be5985"]}
+              fontSize={14}
+              fontWeight={600}
+              onStopSpinning={onStopSpinning}
+            />
+          )}
           <button
             className={styles.spinButton}
             onClick={handleSpinClick}
             disabled={mustSpin || spinTickets <= 0}
           >
-            QUAY
+            {mustSpin ? "ĐANG QUAY..." : "QUAY"}
           </button>
         </div>
 
-        {/* Kết quả */}
         {resultMessage && (
           <p className={styles.resultMessage}>{resultMessage}</p>
         )}
