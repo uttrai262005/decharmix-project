@@ -8,10 +8,13 @@ import { FiUploadCloud, FiX, FiSearch, FiAlertTriangle } from "react-icons/fi";
 import styles from "./VisualSearchModal.module.css";
 import { toast } from "react-hot-toast";
 
-// Lấy API URL
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+// --- XỬ LÝ URL AN TOÀN ---
+const rawUrl =
+  process.env.NEXT_PUBLIC_API_URL || "https://shinsen-backend-api.onrender.com";
+// Loại bỏ dấu gạch chéo ở cuối nếu có để tránh lỗi com//api
+const API_URL = rawUrl.endsWith("/") ? rawUrl.slice(0, -1) : rawUrl;
 
-// --- Interface (Giản lược) ---
+// --- Interface ---
 interface Product {
   id: number;
   name: string;
@@ -22,7 +25,7 @@ interface Product {
 }
 interface SearchResult {
   product: Product;
-  similarity: number; // (Độ giống nhau)
+  similarity: number;
 }
 
 // --- Component Card (Hiển thị kết quả) ---
@@ -69,14 +72,13 @@ export default function VisualSearchModal({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 1. Xử lý khi kéo/thả file
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
       const selectedFile = acceptedFiles[0];
       setFile(selectedFile);
       setPreview(URL.createObjectURL(selectedFile));
-      setResults([]); // Xóa kết quả cũ
-      setError(null); // Xóa lỗi cũ
+      setResults([]);
+      setError(null);
     }
   }, []);
 
@@ -86,7 +88,6 @@ export default function VisualSearchModal({
     multiple: false,
   });
 
-  // 2. Xử lý khi bấm nút "Tìm kiếm"
   const handleSearch = async () => {
     if (!file || !API_URL) return;
 
@@ -95,35 +96,45 @@ export default function VisualSearchModal({
     setResults([]);
 
     const formData = new FormData();
-    formData.append("image", file); // ("image" phải khớp với tên middleware)
+    formData.append("image", file);
 
     try {
-      // 3. Gọi API AI
+      // Gọi API với URL đã được làm sạch dấu gạch chéo
       const res = await fetch(`${API_URL}/api/products/visual-search`, {
         method: "POST",
         body: formData,
-        // (Không cần 'Content-Type', trình duyệt tự thêm)
       });
 
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || "Tìm kiếm thất bại.");
+      // Kiểm tra xem phản hồi có phải là JSON không
+      const contentType = res.headers.get("content-type");
+      if (
+        !res.ok ||
+        !contentType ||
+        !contentType.includes("application/json")
+      ) {
+        const textError = await res.text();
+        console.error("Server response không phải JSON:", textError);
+        throw new Error(
+          "Máy chủ AI đang khởi động hoặc đường dẫn bị sai (404). Hãy thử lại sau 30 giây.",
+        );
       }
 
+      const data = await res.json();
       setResults(data);
+
       if (data.length === 0) {
         setError("Không tìm thấy sản phẩm nào đủ giống.");
       }
     } catch (err: any) {
-      console.error(err);
-      setError(err.message);
-      toast.error(err.message);
+      console.error("Lỗi AI Search:", err);
+      const msg = err.message || "Tìm kiếm thất bại.";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // 4. Xử lý xóa ảnh
   const handleRemoveImage = () => {
     setFile(null);
     setPreview(null);
@@ -139,7 +150,6 @@ export default function VisualSearchModal({
         </button>
         <h2 className={styles.title}>Tìm kiếm bằng Hình ảnh (AI)</h2>
 
-        {/* === PHẦN UPLOAD === */}
         {!preview && (
           <div
             {...getRootProps()}
@@ -156,7 +166,6 @@ export default function VisualSearchModal({
           </div>
         )}
 
-        {/* === PHẦN XEM TRƯỚC & NÚT BẤM === */}
         {preview && (
           <div className={styles.previewContainer}>
             <Image
@@ -181,17 +190,16 @@ export default function VisualSearchModal({
             disabled={isLoading}
           >
             {isLoading ? (
-              <span className={styles.loader}></span> // (Loader CSS)
+              <span className={styles.loader}></span>
             ) : (
               <>
-                <FiSearch />
-                {isLoading ? "Đang phân tích AI..." : "Tìm kiếm sản phẩm"}
+                <FiSearch style={{ marginRight: "8px" }} />
+                Tìm kiếm sản phẩm
               </>
             )}
           </button>
         )}
 
-        {/* === PHẦN KẾT QUẢ === */}
         <div className={styles.resultsContainer}>
           {error && (
             <div className={styles.errorBox}>
