@@ -24,7 +24,7 @@
 /* Hộp form */
 .loginBox {
   width: 100%;
-  max-width: 400px;
+  max-width: 500px;
   padding: 2.5rem;
   background-color: var(--white);
   border-radius: 16px;
@@ -37,7 +37,8 @@
   font-weight: 700;
   color: var(--text-title);
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
+  white-space: nowrap;
 }
 
 .form {
@@ -134,25 +135,34 @@
   font-size: 1.2rem;
 }
 
+/* --- Trong file Login.module.css --- */
+
 .divider {
-  text-align: center;
-  font-size: 0.9rem;
+  /* Dùng Flexbox để căn chỉnh tự động */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   color: var(--text-light);
+  font-size: 0.9rem;
   margin: 1.5rem 0;
-  position: relative;
+  width: 100%;
 }
+
+/* Đường kẻ trước và sau */
 .divider::before,
 .divider::after {
   content: "";
-  position: absolute;
-  top: 50%;
-  width: 35%;
-  height: 1px;
+  flex: 1; /* Quan trọng: Tự động lấp đầy khoảng trống còn thừa */
+  height: 1px; /* Độ mảnh của đường kẻ */
   background-color: var(--border-color);
 }
+
+/* Tạo khoảng cách an toàn giữa chữ và đường kẻ */
 .divider::before {
-  left: 0;
+  margin-right: 1rem; /* Cách chữ ra một đoạn bên trái */
 }
+
 .divider::after {
-  right: 0;
+  margin-left: 1rem; /* Cách chữ ra một đoạn bên phải */
 }

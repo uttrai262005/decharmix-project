@@ -1,0 +1,168 @@
+@startuml
+' =====================================================
+' GLOBAL STYLE – ENTERPRISE (NO OVERLAP)
+' =====================================================
+skinparam componentStyle uml2
+skinparam linetype ortho
+skinparam nodesep 100
+skinparam ranksep 100
+skinparam defaultFontName "Segoe UI"
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam ArrowMessageAlignment center
+skinparam ArrowLabelDistance 2
+
+title "SYSTEM ARCHITECTURE – DECHARMIX"
+
+' =====================================================
+' COLOR PALETTE
+' =====================================================
+skinparam rectangleBackgroundColor<<Frontend>> #E3F2FD
+skinparam rectangleBorderColor<<Frontend>> #1565C0
+
+skinparam rectangleBackgroundColor<<Backend>> #FFF8E1
+skinparam rectangleBorderColor<<Backend>> #EF6C00
+
+skinparam databaseBackgroundColor<<Database>> #E8F5E9
+skinparam databaseBorderColor<<Database>> #2E7D32
+
+skinparam rectangleBackgroundColor<<AI>> #FCE4EC
+skinparam rectangleBorderColor<<AI>> #AD1457
+
+skinparam componentBackgroundColor<<External>> #F3E5F5
+skinparam componentBorderColor<<External>> #6A1B9A
+
+' =====================================================
+' ACTORS
+' =====================================================
+actor Customer
+actor Admin
+
+' =====================================================
+' PRESENTATION – CLIENT
+' =====================================================
+package "Presentation Layer – Client" {
+  rectangle "Web Client\n(Browser / Mobile Web)" as Client <<Frontend>> {
+    frame "UI Modules" {
+      rectangle "Gift Box Builder"
+      rectangle "Game Hub"
+      rectangle "Chatbot Widget"
+    }
+  }
+}
+
+' =====================================================
+' PRESENTATION – SERVER (BFF)
+' =====================================================
+package "Presentation Layer – Server (BFF)" {
+  rectangle "Next.js Server\nSSR + BFF\n:3000" as BFF <<Frontend>> {
+    frame "Server Capabilities" {
+      rectangle "SSR Engine"
+      rectangle "BFF API"
+    }
+  }
+}
+
+' =====================================================
+' APPLICATION – BACKEND (MODIFIED FOR REAL CODE)
+' =====================================================
+package "Application Layer – Backend" {
+
+  rectangle "Backend API\nExpress.js :5000" as API <<Backend>> {
+
+    ' 1. Middleware từ package.json
+    frame "Middleware Pipeline" {
+      rectangle "Auth (Passport/JWT)"
+      rectangle "Multer (Upload)"
+      rectangle "CORS / Validation"
+    }
+
+    ' 2. Business Logic
+    frame "Core Services" {
+      rectangle "Product Service"
+      rectangle "Order Service"
+      rectangle "Payment Service"
+    }
+    
+    ' 3. AI INTEGRATION (IN-PROCESS)
+    ' Đưa vào trong Backend vì code dùng @tensorflow/tfjs trực tiếp
+    frame "AI Engine (In-Process)" {
+      rectangle "TensorFlow.js" as TF <<AI>>
+      rectangle "MobileNet V2" as Model <<AI>>
+      rectangle "Sentiment Analysis" as Senti <<AI>>
+    }
+    
+    ' Sắp xếp nội bộ cho đẹp
+    "Middleware Pipeline" -[hidden]down- "Core Services"
+    "Core Services" -[hidden]down- "AI Engine (In-Process)"
+  }
+}
+
+' =====================================================
+' DATA LAYER
+' =====================================================
+package "Data Layer" {
+  database "PostgreSQL\n(Supabase)" as DB <<Database>> {
+    frame "Relational Data" {
+      rectangle "Users"
+      rectangle "Orders"
+      rectangle "Products"
+    }
+
+    frame "Vector Store\n(pgvector)" {
+      rectangle "Image Embeddings"
+      rectangle "ANN Index"
+    }
+  }
+}
+
+' =====================================================
+' EXTERNAL SERVICES (UPDATED)
+' =====================================================
+package "External Services" {
+  component "Payment Gateways\n(MoMo / VNPay / ZaloPay)" as Pay <<External>>
+  component "Google OAuth\n(Passport Strategy)" as Google <<External>>
+  component "Object Storage\n(Supabase Storage)" as Storage <<External>>
+}
+
+' =====================================================
+' FLOWS (ADJUSTED TO SYNC)
+' =====================================================
+Customer --> Client : HTTPS
+Admin --> Client : HTTPS
+
+Client --> BFF : Initial Request
+BFF --> Client : SSR HTML
+
+Client --> API : REST (Client-side)
+BFF  --> API : REST (Server-side)
+
+' Luồng gọi AI nội bộ (Vẽ mũi tên trong Backend hoặc ghi chú)
+' Ở đây ta vẽ luồng dữ liệu đi qua
+API --> DB : Query\nData
+TF --> DB : Vector Search (SQL)
+
+' Luồng External
+API --> Storage : Upload Image
+API --> Pay : Create Payment URL
+Pay --> API : Webhook (Signed)
+API --> Google : OAuth Flow
+
+' =====================================================
+' LAYOUT HACKS
+' =====================================================
+' Căn chỉnh vị trí External để sơ đồ cân đối
+API -right-> Pay
+API -left-> Google
+
+' =====================================================
+' LEGEND
+' =====================================================
+legend right
+<b>Legend</b>
+------------
+→  Synchronous Call
+(Direct Processing)
+endlegend
+
+@enduml

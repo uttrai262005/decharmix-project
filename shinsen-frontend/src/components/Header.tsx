@@ -160,7 +160,13 @@ export default function Header() {
         <div className={styles.mainHeader}>
           <div className={styles.mainHeaderContent}>
             <Link href="/" className={styles.logo}>
-              Decharmix
+              <Image
+                src="/avt2.png" // <--- THAY ĐỔI ĐƯỜNG DẪN NÀY
+                alt="Decharmix Logo"
+                width={200} // <--- ĐIỀU CHỈNH CHIỀU RỘNG
+                height={60} // <--- ĐIỀU CHỈNH CHIỀU CAO
+                priority // Tùy chọn: giúp logo tải nhanh hơn vì nó là phần tử quan trọng
+              />
             </Link>
 
             {/* Thanh tìm kiếm */}

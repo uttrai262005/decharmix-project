@@ -10,37 +10,37 @@ const gameHubList = [
   {
     title: "Vòng Quay May Mắn",
     description: "Quay liền tay, rinh ngay Xu và voucher giảm giá!",
-    imageUrl: "/game-banner-lucky-wheel.jpg",
+    imageUrl: "/33.png",
     href: "/game/lucky-wheel",
   },
   {
     title: "Đập Hộp Quà",
     description: "Mở hộp quà bí ẩn, 100% trúng thưởng độc quyền.",
-    imageUrl: "/game-banner-gift-box.jpg",
+    imageUrl: "/34.png",
     href: "/game/gift-box",
   },
   {
     title: "Lật Hình Trí Nhớ",
     description: "Thử thách trí nhớ, thắng game trong 60s nhận thưởng!",
-    imageUrl: "/game-banner-memory-match.jpg",
+    imageUrl: "/35.png",
     href: "/game/memory-match",
   },
   {
     title: "Săn Charm Nhanh Tay",
     description: "Click 15 charm trong 30s. Cẩn thận bom!",
-    imageUrl: "/game-banner-whac-a-charm.jpg",
+    imageUrl: "/36.png",
     href: "/game/whac-a-charm",
   },
   {
     title: "Charm Nhảy Vượt Ải",
     description: "Né bom, ăn 10 xu trong 45 giây để thắng!",
-    imageUrl: "/game-banner-charm-jump.jpg",
+    imageUrl: "/37.png",
     href: "/game/charm-jump",
   },
   {
     title: "Chém Charm Né Bom",
     description: "Chém 20 charm. Đừng chém bom hoặc để lỡ 3 charm!",
-    imageUrl: "/game-banner-charm-slice.jpg",
+    imageUrl: "/38.png",
     href: "/game/charm-slice",
   },
 ];

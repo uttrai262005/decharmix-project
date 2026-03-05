@@ -37,10 +37,10 @@
   }
 }
 
-.leftColumn {
+.leftColumn form {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1rem;
 }
 
 .rightColumn {
@@ -50,7 +50,9 @@
 }
 
 .logo {
-  font-size: 2rem;
+  display: block; /* Biến thẻ Link thành khối để nhận lệnh căn giữa */
+  width: 100%;
+  font-size: 2.2rem;
   font-weight: 800;
   color: var(--text-title);
   text-decoration: none;
@@ -115,6 +117,28 @@
   cursor: not-allowed;
 }
 
+.emptyVoucherState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  gap: 1rem;
+  color: var(--text-light);
+  text-align: center;
+}
+
+.emptyVoucherState svg {
+  font-size: 3rem; /* Icon to */
+  color: var(--border-color); /* Màu hồng nhạt hoặc xám */
+  margin-bottom: 0.5rem;
+}
+
+.emptyVoucherState p {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
 /* --- PHƯƠNG THỨC THANH TOÁN --- */
 .paymentOptions {
   display: grid;
@@ -645,8 +669,8 @@
 
 /* 2. CSS cho Form Quà Tặng (Khi bật) */
 
-/* [SỬA] Tiêu đề "Thông tin người nhận quà" - Đã XÓA BỎ rule .sectionTitle svg 
-   để tránh ảnh hưởng các icon tiêu đề khác (FiHome, FiCreditCard...) 
+/* [SỬA] Tiêu đề "Thông tin người nhận quà" - Đã XÓA BỎ rule .sectionTitle svg
+   để tránh ảnh hưởng các icon tiêu đề khác (FiHome, FiCreditCard...)
    Icon sẽ tự động nhận màu --text-title là đúng. */
 
 /* Định dạng cho textarea Lời nhắn (Giữ nguyên) */

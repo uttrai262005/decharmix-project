@@ -10,7 +10,7 @@ const getProducts = async (req, res) => {
   try {
     const { category, filter, limit = 999, page = 1, search, tag } = req.query;
 
-    let queryParams = []; // Chứa các giá trị cho SQL
+    let queryParams = [];
     let query = `
       SELECT 
         p.*, 
@@ -340,35 +340,45 @@ const getRelatedProducts = async (req, res) => {
   const { id } = req.params;
 
   try {
-    // 1. Lấy thông tin (category và tags) của sản phẩm đang xem
+    // BƯỚC 1: Lấy vector của sản phẩm hiện tại
     const productRes = await pool.query(
-      "SELECT category, tags FROM products WHERE id = $1",
+      "SELECT image_vector, category FROM products WHERE id = $1",
       [id]
     );
+
     if (productRes.rows.length === 0) {
-      return res.status(404).json({ error: "Không tìm thấy sản phẩm" });
+      return res.status(404).json({ error: "Product not found" });
     }
 
-    const { category, tags } = productRes.rows[0];
+    const { image_vector, category } = productRes.rows[0];
 
-    // 2. Tạo câu lệnh SQL để tìm sản phẩm
-    // (Tìm 5 sản phẩm khác (NOT id) có CÙNG category HOẶC CÙNG 1 tag)
+    // BƯỚC 2: Kiểm tra xem sản phẩm có vector chưa
+    if (!image_vector) {
+      const fallbackQuery = `
+        SELECT * FROM products 
+        WHERE id != $1 AND category = $2 
+        LIMIT 5
+      `;
+      const fallbackRes = await pool.query(fallbackQuery, [id, category]);
+      return res.json(fallbackRes.rows);
+    }
+
     const query = `
-      SELECT * FROM products
-      WHERE 
-        id != $1 AND (
-          category = $2 OR 
-          tags && $3::text[] 
-        )
+      SELECT 
+        id, name, image_url, price, discount_price, category,
+        (image_vector <=> $2) as distance -- Tính khoảng cách Cosine
+      FROM products
+      WHERE id != $1 AND image_vector IS NOT NULL
+      ORDER BY distance ASC -- Khoảng cách càng nhỏ => Độ giống (Similarity) càng cao
       LIMIT 5;
     `;
 
-    const relatedRes = await pool.query(query, [id, category, tags || []]);
+    const relatedRes = await pool.query(query, [id, image_vector]);
 
     res.json(relatedRes.rows);
   } catch (error) {
-    console.error("Lỗi khi lấy sản phẩm liên quan:", error.message);
-    res.status(500).json({ error: "Lỗi server" });
+    console.error("Lỗi Related Products AI:", error.message);
+    res.status(500).json({ error: "Server Error" });
   }
 };
 const getAlsoBoughtProducts = async (req, res) => {
@@ -415,7 +425,7 @@ const getAlsoBoughtProducts = async (req, res) => {
     res.status(500).json({ error: "Lỗi server" });
   }
 };
-let model; // (Giữ mô hình AI)
+let model;
 
 // === CÁC HÀM HELPER CHO AI ===
 
@@ -468,7 +478,6 @@ async function loadImage(filePath) {
 async function getVector(imageTensor) {
   try {
     // 2. XÓA LOGIC TẢI AI Ở ĐÂY
-    // (Giả định rằng 'model' đã được tải lúc server khởi động)
     const vector = model.infer(imageTensor, true).arraySync()[0];
     return vector;
   } catch (error) {
@@ -481,9 +490,8 @@ async function getVector(imageTensor) {
 }
 
 // HÀM 3: HÀM KHỞI ĐỘNG AI (MỚI)
-// (Hàm này sẽ được gọi bởi server.js)
 const initMobileNetModel = async () => {
-  if (model) return; // (Nếu đã tải rồi thì thôi)
+  if (model) return;
   try {
     console.log("🤖 Đang tải mô hình AI (MobileNet) vào bộ nhớ...");
     model = await mobilenet.load();
@@ -493,11 +501,10 @@ const initMobileNetModel = async () => {
   }
 };
 
-// HÀM 4: API VISUAL SEARCH (Đã nâng cấp pgvector)
+// HÀM 4: API VISUAL SEARCH
 const visualSearch = async (req, res) => {
   try {
     if (!model) {
-      // (Phòng trường hợp model chưa kịp tải)
       return res
         .status(503)
         .json({ error: "AI đang khởi động, vui lòng thử lại sau 10 giây." });
@@ -507,7 +514,7 @@ const visualSearch = async (req, res) => {
     }
     const filePath = req.file.path;
 
-    // 1. "Cho" AI "nhìn" ảnh user upload
+    // 1.  user upload
     const imageTensor = await loadImage(filePath);
     if (!imageTensor) {
       return res.status(400).json({ error: "Không thể đọc file ảnh." });
@@ -515,7 +522,7 @@ const visualSearch = async (req, res) => {
     const userVector = await getVector(imageTensor);
     tf.dispose(imageTensor);
 
-    // 2. Dùng SQL (pgvector)
+    // 2. Dùng SQL
     const userVectorString = JSON.stringify(userVector);
     const query = `
       SELECT 
@@ -550,10 +557,10 @@ const visualSearch = async (req, res) => {
   }
 };
 const getForYouRecommendations = async (req, res) => {
-  const userId = req.user.id; // (Lấy từ middleware 'protect')
+  const userId = req.user.id;
 
   try {
-    // 1. Lấy "Vector Khẩu vị" của user
+    // 1. Lấy "Vector" của user
     const { rows } = await pool.query(
       "SELECT taste_vector FROM users WHERE id = $1",
       [userId]
@@ -561,7 +568,7 @@ const getForYouRecommendations = async (req, res) => {
 
     const userVectorString = rows[0]?.taste_vector;
 
-    // (Nếu user chưa có "khẩu vị", trả về sản phẩm mới nhất)
+    // Nếu user chưa có, trả về sản phẩm mới nhất
     if (!userVectorString) {
       const { rows: newProducts } = await pool.query(
         "SELECT * FROM products ORDER BY created_at DESC LIMIT 10"
@@ -569,7 +576,7 @@ const getForYouRecommendations = async (req, res) => {
       return res.json(newProducts);
     }
 
-    // 2. Dùng pgvector để tìm sản phẩm GẦN NHẤT với "khẩu vị"
+    // 2. Dùng pgvector để tìm sản phẩm GẦN NHẤT với taste vector
     const query = `
       SELECT 
         id, name, image_url, price, discount_price, category,

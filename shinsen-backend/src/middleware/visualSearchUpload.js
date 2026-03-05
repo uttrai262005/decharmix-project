@@ -32,6 +32,5 @@ const visualSearchUpload = multer({
   fileFilter: function (req, file, cb) {
     checkFileType(file, cb);
   },
-}).single("image"); // (Tên trường <input> sẽ là "image")
-
+}).single("image");
 module.exports = visualSearchUpload;

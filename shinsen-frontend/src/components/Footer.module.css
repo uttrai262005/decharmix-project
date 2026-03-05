@@ -12,7 +12,7 @@
 
 /* --- Wrapper chính --- */
 .footerWrapper {
-  background-color: var(--bg-footer);
+  background-color: var(--bg-pink);
   color: var(--text-footer-main);
   position: relative;
   overflow: hidden;
@@ -23,7 +23,7 @@
   position: absolute;
   inset: 0;
   z-index: 0;
-  opacity: 0.5; /* Giảm độ đậm của họa tiết */
+  opacity: 1; /* Giảm độ đậm của họa tiết */
 }
 
 /* --- Bố cục --- */
@@ -61,11 +61,12 @@
 
 /* --- Cột 1: Logo & Social --- */
 .logo {
-  font-size: 2.25rem;
-  font-weight: 800;
-  color: var(--text-footer-title);
-  letter-spacing: -1px;
-  text-decoration: none;
+  /* Các style này không cần thiết khi dùng Image */
+  /* font-size: 1.75rem; */
+  /* font-weight: 700; */
+  /* color: #166534; */
+  display: flex; /* Đảm bảo logo image được căn chỉnh tốt */
+  align-items: center;
 }
 
 .description {
@@ -92,7 +93,7 @@
 .footerTitle {
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--text-footer-title); /* Tiêu đề màu hồng đậm */
+  color: #004aad; /* Tiêu đề màu hồng đậm */
 }
 
 .linkList {

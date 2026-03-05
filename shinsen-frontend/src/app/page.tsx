@@ -23,7 +23,7 @@ export default function HomePage() {
       scale: 1,
       transition: { duration: 0.6, ease: "backOut", delay: 0.8 },
     },
-    hover: { scale: 1.05, boxShadow: "0 0 25px rgba(22, 163, 74, 0.6)" },
+    hover: { scale: 1.05, boxShadow: "0 0 25px #004aad" },
     tap: { scale: 0.95 },
   };
 
@@ -32,7 +32,7 @@ export default function HomePage() {
       {/* Lớp 1: Nền và các hiệu ứng trang trí */}
       <div
         className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: "url('/hero-background.jpg')" }}
+        style={{ backgroundImage: "url('/cover.png')" }}
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
 
@@ -46,15 +46,17 @@ export default function HomePage() {
       >
         <motion.h1
           className="text-4xl md:text-6xl lg:text-7xl font-bold mb-4 drop-shadow-lg"
+          style={{ color: "#be5985" }}
           initial="hidden"
           animate="visible"
           variants={textVariants}
         >
-          Chào mừng đến với Shinsen!
+          Chào mừng đến với Decharmix!
         </motion.h1>
 
         <motion.p
           className="text-lg md:text-xl max-w-2xl mb-8 drop-shadow-lg"
+          style={{ color: "#004aad" }}
           initial="hidden"
           animate="visible"
           variants={{
@@ -65,7 +67,7 @@ export default function HomePage() {
             },
           }}
         >
-          Nông sản tươi ngon & Hải sản cao cấp từ trang trại, đến bàn ăn.
+          Mix your way, Slay all day !!
         </motion.p>
 
         <Link href="/products">

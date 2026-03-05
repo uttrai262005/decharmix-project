@@ -12,7 +12,7 @@ import {
 } from "react-icons/fi";
 import { FaCcVisa, FaCcMastercard, FaCcJcb } from "react-icons/fa";
 import styles from "./Footer.module.css";
-
+import Image from "next/image";
 // --- Họa tiết sóng (Đã đổi màu fill) ---
 const SeigaihaPattern = () => (
   <div
@@ -57,7 +57,12 @@ export default function Footer() {
           {/* Cột 1: Logo & Giới thiệu */}
           <div className={styles.column}>
             <Link href="/" className={styles.logo}>
-              Decharmix {/* <-- 3. ĐỔI TÊN */}
+              <Image
+                src="/avt2.png" // <--- THAY ĐỔI ĐƯỜNG DẪN THỰC TẾ
+                alt="Decharmix Logo Footer"
+                width={230} // <--- ĐIỀU CHỈNH KÍCH THƯỚC CHIỀU RỘNG
+                height={70} // <--- ĐIỀU CHỈNH KÍCH THƯỚC CHIỀU CAO
+              />
             </Link>
             <p className={styles.description}>
               Phụ kiện handmade độc đáo,

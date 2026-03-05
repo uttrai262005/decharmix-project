@@ -15,6 +15,30 @@
   padding: 0 1.5rem;
   font-family: inherit;
 }
+a
+
+
+/* --- Trong file ProductDetailPage.module.css --- */
+
+
+.backLink {
+  display: flex; /* QUAN TRỌNG: Đưa icon và chữ lên cùng 1 hàng */
+  align-items: center; /* Căn giữa theo chiều dọc (để mũi tên không bị lệch) */
+  gap: 0.5rem; /* Tạo khoảng cách nhỏ giữa mũi tên và chữ */
+
+  /* Trang trí thêm cho đẹp */
+  width: fit-content; /* Ôm sát nội dung */
+  margin-bottom: 1.5rem; /* Cách phần sản phẩm bên dưới ra */
+  font-weight: 600;
+  color: #555; /* Màu xám đậm (hoặc #be5985 nếu thích hồng) */
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.backLink:hover {
+  color: #fe98bf; /* Đổi màu hồng khi di chuột vào */
+  transform: translateX(-3px); /* Hiệu ứng lùi nhẹ sang trái nhìn rất hay */
+}
 
 .productGrid {
   display: grid;
@@ -28,6 +52,32 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 3rem;
   }
+}
+
+/* --- Trong file ProductDetailPage.module.css --- */
+
+.ratingWrapper {
+  display: flex !important; /* Thêm !important để chắc chắn lệnh flex được ưu tiên */
+  align-items: center; /* Căn giữa theo chiều dọc */
+  flex-direction: row; /* Bắt buộc xếp hàng ngang */
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  width: fit-content; /* Ôm sát nội dung, tránh bị kéo giãn */
+}
+
+/* Nếu StarRating là một thẻ div, đôi khi nó tự có margin, ta reset lại cho chắc */
+.ratingWrapper > div:first-child {
+  margin: 0;
+  padding: 0;
+  display: flex; /* Đảm bảo sao bên trong cũng flex */
+}
+
+.reviewCountText {
+  color: #6b7280;
+  font-size: 0.95rem;
+  font-weight: 500;
+  white-space: nowrap; /* Ngăn dòng chữ bị ngắt xuống dòng */
+  margin-top: 2px; /* Chỉnh nhẹ để thẳng hàng mắt nhìn */
 }
 
 /* --- Cột hình ảnh --- */
@@ -122,7 +172,12 @@
   font-weight: 600;
   margin-bottom: 1.5rem;
 }
-
+.statusAvailable,
+.statusUnavailable {
+  display: flex; /* QUAN TRỌNG: Để icon và chữ nằm ngang hàng */
+  align-items: center; /* Căn giữa icon với dòng chữ */
+  gap: 0.5rem; /* Khoảng cách giữa icon và chữ */
+}
 .statusAvailable {
   color: #be5985; /* Hồng đậm (làm màu phụ) */
 }
@@ -164,7 +219,17 @@
   color: #4b5563;
   transition: background-color 0.2s, color 0.2s;
 }
+/* --- Trong file ProductDetailPage.module.css --- */
 
+.introductionSection {
+  color: #555;
+  line-height: 1.7;
+  font-size: 1.05rem;
+
+  /* --- SỬA DÒNG NÀY --- */
+  /* Cũ: 2rem -> Mới: 3.5rem hoặc 4rem (Tùy độ thoáng bạn muốn) */
+  margin-bottom: 2rem;
+}
 .quantityButton:hover {
   background-color: #f6bcf1; /* Nền hồng nhạt */
 }
@@ -210,6 +275,7 @@
   border-radius: 0.75rem;
   padding: 2rem;
   border: 1px solid #ffe2f2; /* Viền hồng phấn */
+  margin-bottom: 3rem;
 }
 
 .extraInfoGrid h2 {
@@ -492,11 +558,12 @@
 
 /* --- Hộp Tóm tắt Cảm xúc (ML) --- */
 .sentimentBox {
-  margin-top: 1.5rem;
+  margin-top: 1rem;
   padding: 1rem;
   background-color: var(--bg-pink, #fff5f9);
   border-radius: 8px;
   border: 1px solid var(--border-color, #ffe2f2);
+  margin-bottom: 1rem;
 }
 
 .sentimentTitle {

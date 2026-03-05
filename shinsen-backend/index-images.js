@@ -1,8 +1,3 @@
-/*
- * SCRIPT HƯỚNG DẪN AI (VISUAL SEARCH) - PHIÊN BẢN JAVASCRIPT
- * * (Đã nâng cấp để dùng cột pgvector)
- */
-
 const tf = require("@tensorflow/tfjs");
 const mobilenet = require("@tensorflow-models/mobilenet");
 const { Pool } = require("pg");

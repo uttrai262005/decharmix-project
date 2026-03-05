@@ -164,10 +164,10 @@ export default function GiftBoxBuilderPage() {
   return (
     <div className={styles.pageWrapper}>
       <div className={styles.container}>
-        <h1 className={styles.title}>Xưởng Gói Quà Decharmix</h1>
+        <h1 className={styles.title}>Xưởng gói quà Decharmix</h1>
         <p className={styles.subtitle}>
-          Tự tay thiết kế hộp quà của riêng bạn. Chọn các món trang sức và phụ
-          kiện gói quà bên dưới.
+          Nơi bạn tự tay thiết kế hộp quà của riêng bạn! Vui lòng các món trang
+          sức và phụ kiện gói quà bên dưới.
         </p>
 
         <div className={styles.mainLayout}>
@@ -179,21 +179,21 @@ export default function GiftBoxBuilderPage() {
               <>
                 {/* Chỉ render các bước khác NẾU đã chọn Hộp */}
                 {renderProductSection(
-                  "Bước 1: Chọn Phụ Kiện Gói Quà (Hộp, Thiệp...)",
+                  "Bước 1: Chọn phụ kiện gói quà (Hộp, Thiệp...)",
                   assets?.phuKienGoiQua || []
                 )}
                 {selectedBox && (
                   <>
                     {renderProductSection(
-                      "Bước 2: Chọn Vòng Tay",
+                      "Bước 2: Chọn vòng tay",
                       assets?.vongTay || []
                     )}
                     {renderProductSection(
-                      "Bước 3: Chọn Dây Chuyền",
+                      "Bước 3: Chọn dây chuyền",
                       assets?.dayChuyen || []
                     )}
                     {renderProductSection(
-                      "Bước 4: Chọn Phụ Kiện Tóc",
+                      "Bước 4: Chọn phụ kiện tóc",
                       assets?.phuKienToc || []
                     )}
                   </>
@@ -206,7 +206,7 @@ export default function GiftBoxBuilderPage() {
           <div className={styles.rightColumn}>
             <div className={styles.summaryBox}>
               <h3 className={styles.summaryTitle}>
-                <FiBox /> Hộp Quà Của Bạn
+                <FiBox /> Hộp quà của bạn
               </h3>
 
               {/* === KHU VỰC GIẢ LẬP TRỰC QUAN === */}

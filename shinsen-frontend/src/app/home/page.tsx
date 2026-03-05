@@ -189,17 +189,17 @@ export default function HomePage() {
   const categories = [
     {
       name: "Vòng Tay",
-      imageUrl: "/category-vong-tay.jpg",
+      imageUrl: "/27.png",
       href: "/products?category=VONG TAY",
     },
     {
-      name: "Dây Chuyền",
-      imageUrl: "/category-day-chuyen.jpg",
+      name: "Dây Đeo",
+      imageUrl: "/28.png",
       href: "/products?category=DAY CHUYEN",
     },
     {
-      name: "Phụ Kiện Tóc",
-      imageUrl: "/category-phu-kien-toc.jpg",
+      name: "Phụ Kiện Tùy Chỉnh",
+      imageUrl: "/29.png",
       href: "/products?category=PHU KIEN TOC",
     },
   ];
@@ -209,37 +209,37 @@ export default function HomePage() {
     {
       title: "Vòng Quay May Mắn",
       description: "Quay liền tay, rinh ngay Xu và voucher giảm giá!",
-      imageUrl: "/game-banner-lucky-wheel.jpg", // <-- Bạn cần tạo ảnh này
+      imageUrl: "/33.png", // <-- Bạn cần tạo ảnh này
       href: "/game/lucky-wheel",
     },
     {
       title: "Đập Hộp Quà",
       description: "Mở hộp quà bí ẩn, 100% trúng thưởng độc quyền.",
-      imageUrl: "/game-banner-gift-box.jpg", // <-- Bạn cần tạo ảnh này
+      imageUrl: "/34.png", // <-- Bạn cần tạo ảnh này
       href: "/game/gift-box",
     },
     {
       title: "Lật Hình Trí Nhớ", // <-- Đổi tên
       description: "Thử thách trí nhớ, thắng game trong 60s nhận thưởng!", // <-- Đổi mô tả
-      imageUrl: "/game-banner-memory-match.jpg", // <-- Tạo ảnh banner mới
+      imageUrl: "/35.png", // <-- Tạo ảnh banner mới
       href: "/game/memory-match", // <-- SỬA Ở ĐÂY
     },
     {
       title: "Săn Charm Nhanh Tay",
       description: "Click 15 charm trong 30s. Cẩn thận bom!",
-      imageUrl: "/game-banner-whac-a-charm.jpg", // <-- Tạo ảnh banner mới
+      imageUrl: "/36.png", // <-- Tạo ảnh banner mới
       href: "/game/whac-a-charm",
     },
     {
       title: "Charm Nhảy Vượt Ải",
       description: "Né bom, ăn 10 xu trong 45 giây để thắng!",
-      imageUrl: "/game-banner-charm-jump.jpg", // <-- Tạo ảnh banner mới
+      imageUrl: "/37.png", // <-- Tạo ảnh banner mới
       href: "/game/charm-jump",
     },
     {
       title: "Chém Charm Né Bom",
       description: "Chém 20 charm. Đừng chém bom hoặc để lỡ 3 charm!",
-      imageUrl: "/game-banner-charm-slice.jpg", // <-- Tạo ảnh banner mới
+      imageUrl: "/38.png", // <-- Tạo ảnh banner mới
       href: "/game/charm-slice",
     },
   ];
@@ -526,53 +526,6 @@ export default function HomePage() {
                 <ProductCard key={product.id} product={product} index={i} />
               ))}
             </div>
-          )}
-        </section>
-
-        {/* ===== 7. GÓC SÁNG TẠO (BLOG) ===== */}
-        <section
-          className={`${styles.container} ${styles.section} ${styles.bgPink}`}
-        >
-          <h2 className={styles.sectionTitle}>Góc Sáng Tạo Decharmix</h2>
-          {isLoading ? (
-            <div className={styles.loadingPlaceholder}>
-              Đang tải bài viết...
-            </div>
-          ) : (
-            <>
-              <div className={styles.blogGrid}>
-                {blogPosts.map((post, index) => (
-                  <motion.div
-                    key={post.id}
-                    className={styles.blogCard}
-                    initial={{ opacity: 0, y: 50 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.5 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                  >
-                    <div className={styles.blogImageWrapper}>
-                      <Image
-                        src={post.image_url || "/placeholder.png"}
-                        alt={post.title}
-                        fill
-                        style={{ objectFit: "cover" }}
-                        sizes="50vw"
-                      />
-                    </div>
-                    <div className={styles.blogContent}>
-                      <p className={styles.blogCategory}>{post.category}</p>
-                      <h3 className={styles.blogTitle}>{post.title}</h3>
-                      <Link
-                        href={`/blog/${post.href}`}
-                        className={styles.blogLink}
-                      >
-                        Đọc tiếp <FiArrowRight />
-                      </Link>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </>
           )}
         </section>
 

@@ -1,19 +1,22 @@
-/* === BIẾN MÀU (Chủ đề Decharmix) === */
+/* === BIẾN MÀU (Chủ đề Decharmix ĐÃ TỐI ƯU) === */
 :root {
-  --bg-cream: #ffffeb; /* Nền vàng kem (Vàng nhạt) - Nền chính */
+  --bg-cream: #ffffd8; /* Nền vàng kem/Vàng nhạt (Nền chính) - Thay đổi từ #ffffeb */
   --bg-pink-light: #fff5f9; /* Nền hồng siêu nhạt (cho các section) */
   --text-title: #be5985; /* Hồng đậm (cho tiêu đề, logo) */
   --text-main: #7c596b; /* Hồng xám/nâu (cho text thường) */
   --text-light: #a18c96; /* Hồng xám nhạt (cho sub-text) */
   --brand-pink: #fe98bf; /* Hồng nhạt (cho nút, hover) */
-  --brand-pink-darker: #f6bcf1; /* Hồng tím nhạt */
+  --brand-pink-darker: #f6bcf1; /* Hồng tím nhạt (Màu nhấn 2) */
   --border-color: #ffe2f2; /* Viền hồng kem */
+  --brand-blue-accent: #d3ecff; /* Xanh nhạt (Màu nhấn phụ cho game/khuyến mãi) */
   --white: #ffffff;
+  /* !!! Đảm bảo biến --bg-pink tồn tại và trỏ đến màu hồng nhạt bạn muốn !!! */
+  --bg-pink: var(--bg-pink-light);
 }
 
 /* === BỐ CỤC CHUNG === */
 .pageWrapper {
-  background-color: var(--bg-cream);
+  background-color: #ffffe1;
   color: var(--text-main);
   overflow-x: hidden; /* Chống cuộn ngang */
 }
@@ -45,12 +48,16 @@
   color: var(--text-light);
 }
 
-/* === 1. HERO SLIDER === */
+/* === 1. HERO SLIDER (ĐÃ TỐI ƯU) === */
+/* === 1. HERO SLIDER (ĐÃ CẬP NHẬT KÍCH THƯỚC CHIỀU CAO CỐ ĐỊNH) === */
 .heroSection {
-  width: 100%;
-  height: 80vh; /* 80% chiều cao màn hình */
-  min-height: 500px;
-  max-height: 700px;
+  width: 85%;
+  height: 527px; /* Chiều cao cố định theo yêu cầu 527px */
+  min-height: 527px;
+  max-height: 527px;
+  margin-top: 20px; /* Thêm khoảng cách 20px ở lề trên (bạn có thể điều chỉnh giá trị này) */
+  margin-left: auto; /* Căn giữa theo chiều ngang */
+  margin-right: auto; /* Căn giữa theo chiều ngang */
 }
 .heroSwiper {
   width: 100%;
@@ -76,7 +83,7 @@
 .slideOverlay {
   position: absolute;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.3); /* Lớp phủ tối nhẹ */
+  background-color: rgba(0, 0, 0, 0.25);
   z-index: 2;
 }
 .slideText {
@@ -124,25 +131,26 @@
   opacity: 1 !important;
 }
 
-/* === 2. CAM KẾT === */
+/* === 2. CAM KẾT (ĐÃ TỐI ƯU) === */
 .commitmentsSection {
-  padding: 4rem 1rem;
+  padding: 3rem 1rem;
   background-color: var(--white);
   border-radius: 12px;
   margin-top: -4rem; /* Kéo lên đè lên banner */
   position: relative;
   z-index: 5;
-  width: calc(100% - 2rem);
-  max-width: 1200px;
+  width: 2000px;
+  height: 150px;
+
   margin-left: auto;
   margin-right: auto;
   border: 1px solid var(--border-color);
-  box-shadow: 0 10px 30px rgba(255, 226, 242, 0.5);
+  box-shadow: 0 12px 40px rgba(255, 200, 240, 0.7); /* Tăng bóng và màu hồng hơn */
 }
 .commitmentsGrid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 2rem;
+  gap: 1rem;
 }
 @media (min-width: 768px) {
   .commitmentsGrid {
@@ -155,13 +163,13 @@
   gap: 1rem;
 }
 .commitmentIcon {
-  font-size: 2.5rem;
-  color: var(--brand-pink);
+  font-size: 2.75rem; /* Tăng kích thước */
+  color: var(--text-title); /* Dùng màu hồng đậm để nổi bật */
   flex-shrink: 0;
 }
 .commitmentTitle {
-  font-size: 1.1rem;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 700;
   color: var(--text-title);
   margin-bottom: 0.25rem;
 }
@@ -170,7 +178,7 @@
   line-height: 1.6;
 }
 
-/* === 3. DANH MỤC === */
+/* === 3. DANH MỤC (ĐÃ CHỈNH SỬA: LUÔN 3 CỘT ĐỀU NHAU TRÊN DESKTOP) === */
 .categoryGrid {
   display: grid;
   grid-template-columns: 1fr;
@@ -181,16 +189,17 @@
     grid-template-columns: repeat(3, 1fr);
   }
   .categoryCard:first-child {
-    grid-column: span 1;
+    grid-column: span 1; /* Đảm bảo mục đầu tiên chỉ chiếm 1 cột trên tablet */
   }
 }
 @media (min-width: 1024px) {
   .categoryGrid {
     grid-template-columns: repeat(3, 1fr);
   }
-  /* Cột đầu tiên chiếm 2 phần */
+  /* XÓA: .categoryCard:first-child { grid-column: span 2; } */
+  /* Bằng cách đặt lại span 1, đảm bảo tất cả các mục đều nhau */
   .categoryCard:first-child {
-    grid-column: span 2;
+    grid-column: span 1;
   }
 }
 .categoryCard {
@@ -238,26 +247,45 @@
   opacity: 1;
 }
 
-/* === 4. DEAL HOT === */
+/* === 4. DEAL HOT (ĐÃ CHỈNH SỬA LẠI: HIỆU ỨNG THẺ NỔI VÀ MÀU NHẤN MỚI) === */
+
+/* Thay đổi khu vực chứa Deal Hot thành màu nền xanh nhạt (Màu nhấn phụ) */
+
+.bgPink {
+  background-color: #e5f2fc;
+  /* Tăng độ dày viền, dùng màu hồng tím đậm hơn để nổi bật */
+  border-top: 2px solid var(--brand-pink-darker);
+  border-bottom: 2px solid var(--brand-pink-darker);
+  border-radius: 20px;
+  padding: 4rem 1rem;
+  /* Thêm đổ bóng lớn, mềm mại cho section */
+  box-shadow: 0 10px 40px rgba(246, 190, 241, 0.4);
+}
 .dealGrid {
   display: grid;
   grid-template-columns: 1fr;
   align-items: center;
-  gap: 2rem;
+  gap: 1 rem; /* Tăng khoảng cách */
 }
-@media (min-width: 768px) {
+@media (min-width: 668px) {
   .dealGrid {
-    grid-template-columns: 1fr 1fr;
-    gap: 3rem;
+    grid-template-columns: 1fr 1.2fr; /* Cho phần nội dung chiếm nhiều không gian hơn */
+    gap: 4rem;
   }
 }
 .dealImageWrapper {
   position: relative;
   width: 100%;
   aspect-ratio: 1 / 1;
-  border-radius: 12px;
+  border-radius: 20px; /* Bo góc lớn hơn */
   overflow: hidden;
-  border: 1px solid var(--border-color);
+  border: 4px solid var(--white); /* Thêm viền trắng dày */
+  /* Tạo đổ bóng nổi bật, sử dụng màu hồng tím nhạt */
+  box-shadow: 0 10px 40px rgba(246, 190, 241, 0.7);
+  transition: transform 0.3s ease;
+}
+.dealImageWrapper:hover {
+  transform: scale(1.02);
 }
 .dealContent {
   padding: 1rem 0;
@@ -266,22 +294,22 @@
 @media (min-width: 768px) {
   .dealContent {
     text-align: left;
-    padding: 2rem;
+    padding: 0; /* Bỏ padding trên desktop */
   }
 }
 .dealTitle {
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--text-title);
+  font-size: 2rem; /* Tăng kích thước tiêu đề */
+  font-weight: 800; /* Tăng độ đậm */
+  color: #004aad;
   margin-bottom: 1rem;
-  line-height: 1.3;
+  line-height: 1.2;
 }
 .dealPrices {
   display: flex;
   align-items: baseline;
   justify-content: center;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
+  gap: 1.25rem; /* Tăng khoảng cách */
+  margin-bottom: 2rem; /* Tăng margin bottom */
 }
 @media (min-width: 768px) {
   .dealPrices {
@@ -289,26 +317,27 @@
   }
 }
 .dealSalePrice {
-  font-size: 2.25rem;
-  font-weight: 700;
+  font-size: 2.8rem; /* Rất lớn để thu hút */
+  font-weight: 850;
   color: var(--text-title);
 }
 .dealOriginalPrice {
-  font-size: 1.25rem;
+  font-size: 1.4rem;
   color: var(--text-light);
   text-decoration: line-through;
 }
 .countdownWrapper {
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
 }
 .countdownWrapper p {
-  font-size: 0.9rem;
-  color: var(--text-main);
-  margin-bottom: 0.5rem;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-title); /* Chuyển màu chữ đếm ngược sang hồng đậm */
+  margin-bottom: 0.8rem;
 }
 .countdownTimer {
   display: flex;
-  gap: 0.75rem;
+  gap: 1.5rem;
   justify-content: center;
 }
 @media (min-width: 768px) {
@@ -316,45 +345,55 @@
     justify-content: flex-start;
   }
 }
+/* Thiết kế khối thời gian như sticker dễ thương */
 .timeBlock {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   background-color: var(--white);
-  border: 1px solid var(--border-color);
-  width: 70px;
-  height: 70px;
-  border-radius: 8px;
+  border: 3px solid var(--brand-pink-darker); /* Viền hồng tím đậm */
+  box-shadow: 0 4px 0 var(--brand-pink); /* Bóng nổi 3D (hiệu ứng dán/sticker) */
+  width: 75px; /* Tăng kích thước khối */
+  height: 75px;
+  border-radius: 12px; /* Bo góc mềm mại */
+  transition: transform 0.1s;
+}
+.timeBlock:active {
+  transform: translateY(4px); /* Nhấn xuống khi active */
+  box-shadow: 0 0 0 var(--brand-pink);
 }
 .timeBlock span:first-child {
-  font-size: 1.75rem;
-  font-weight: 700;
+  font-size: 2.2rem; /* Tăng kích thước số */
+  font-weight: 900;
   color: var(--text-title);
 }
 .timeBlock span:last-child {
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   color: var(--text-main);
+  font-weight: 600;
 }
 .dealButton {
-  background-color: var(--brand-pink);
+  background-color: var(--text-title); /* Hồng đậm nhất cho CTA */
   color: var(--white);
-  padding: 0.8rem 2rem;
+  padding: 1rem 2.5rem; /* Tăng kích thước nút */
   border-radius: 50px;
-  font-weight: 600;
-  font-size: 1rem;
+  font-weight: 700;
+  font-size: 1.1rem;
   transition: all 0.3s ease;
   border: none;
   cursor: pointer;
   text-decoration: none;
   display: inline-block;
+  box-shadow: 0 4px 10px rgba(190, 89, 133, 0.4); /* Bóng nhẹ */
 }
 .dealButton:hover {
-  background-color: var(--brand-pink-darker);
-  transform: scale(1.05);
+  background-color: var(--brand-pink);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(190, 89, 133, 0.6);
 }
 
-/* === 5 & 7. PRODUCT CARD GRID (New & BestSellers) === */
+/* === 5 & 7. PRODUCT CARD GRID (New & BestSellers - ĐÃ TỐI ƯU NÚT) === */
 .productGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -431,8 +470,8 @@
   width: 100%;
   padding: 0.6rem;
   background-color: var(--white);
-  border: 1px solid var(--brand-pink);
-  color: var(--brand-pink);
+  border: 1px solid var(--text-title); /* Viền hồng đậm */
+  color: var(--text-title); /* Text hồng đậm */
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
@@ -442,11 +481,11 @@
   font-size: 0.9rem;
 }
 .productButton:hover {
-  background-color: var(--brand-pink);
+  background-color: var(--text-title); /* Hover: nền hồng đậm */
   color: var(--white);
 }
 
-/* === 6. BLOG CARD === */
+/* === 6. BLOG CARD (ĐÃ TỐI ƯU MÀU) === */
 .blogGrid {
   display: grid;
   grid-template-columns: 1fr;
@@ -474,9 +513,9 @@
   padding: 1.5rem;
 }
 .blogCategory {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 700;
-  color: var(--brand-pink);
+  color: var(--text-title); /* Dùng màu hồng đậm cho category */
   text-transform: uppercase;
   margin-bottom: 0.5rem;
 }
@@ -503,17 +542,17 @@
   transition: color 0.2s;
 }
 .blogLink:hover {
-  color: var(--brand-pink);
+  color: var(--text-title); /* Hover: đổi sang màu hồng đậm */
 }
 
-/* === 8. NEWSLETTER === */
+/* === 8. NEWSLETTER (ĐÃ TỐI ƯU) === */
 .newsletterSection {
   text-align: center;
   padding: 3rem 1.5rem;
   background-color: var(--white);
   border-radius: 12px;
   border: 1px solid var(--border-color);
-  box-shadow: 0 4px 12px rgba(255, 226, 242, 0.4);
+  box-shadow: 0 4px 12px rgba(246, 190, 245, 0.5); /* Shadow hồng tím nhẹ */
 }
 .newsletterSection p {
   color: var(--text-main);
@@ -537,12 +576,12 @@
 }
 .newsletterForm input:focus {
   outline: none;
-  border-color: var(--brand-pink);
-  box-shadow: 0 0 0 3px var(--light-pink);
+  border-color: var(--brand-pink-darker); /* Dùng hồng tím cho focus */
+  box-shadow: 0 0 0 3px rgba(246, 190, 245, 0.4);
 }
 .newsletterForm button {
   padding: 0.8rem 1.5rem;
-  background-color: var(--brand-pink);
+  background-color: var(--text-title); /* Nút chính dùng màu hồng đậm */
   color: var(--white);
   border: none;
   border-radius: 0 8px 8px 0;
@@ -551,20 +590,10 @@
   transition: background-color 0.2s;
 }
 .newsletterForm button:hover {
-  background-color: var(--brand-pink-darker);
+  background-color: var(--brand-pink); /* Hover: hồng nhạt */
 }
-/* TRONG FILE: src/app/(main)/Home.module.css */
 
-/* === 1. HERO SLIDER (ĐÃ SỬA LỖI TRÀN) === */
-.heroSection {
-  width: 100%;
-  height: 60vh; /* <-- GIẢM TỪ 80vh XUỐNG 60vh */
-  min-height: 450px; /* <-- GIẢM TỪ 500px */
-  max-height: 550px; /* <-- GIẢM TỪ 700px */
-}
-/* === BẮT ĐẦU: CSS MỚI CHO GÓC SĂN THƯỞNG === */
-/* (Dán vào cuối file Home.module.css) */
-
+/* === GÓC SĂN THƯỞNG (ĐÃ TỐI ƯU MÀU NHẤN) === */
 .gameGrid {
   display: grid;
   grid-template-columns: 1fr;
@@ -576,10 +605,10 @@
   }
 }
 .gameCard {
-  background-color: var(--white);
+  background-color: var(--brand-blue-accent); /* Nền xanh nhạt mới */
   border-radius: 12px;
-  border: 1px solid var(--border-color);
-  box-shadow: 0 4px 12px rgba(255, 226, 242, 0.3);
+  border: 1px solid #c2e0ff;
+  box-shadow: 0 4px 12px rgba(211, 236, 255, 0.5); /* Shadow xanh nhạt */
   overflow: hidden;
   display: flex;
   flex-direction: column; /* Xếp chồng trên mobile */
@@ -587,7 +616,7 @@
 }
 .gameCard:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 15px rgba(255, 226, 242, 0.7);
+  box-shadow: 0 8px 15px rgba(211, 236, 255, 0.9);
 }
 /* Style cho ảnh/nội dung nằm ngang trên desktop */
 @media (min-width: 640px) {
@@ -609,6 +638,7 @@
   }
 }
 .gameImage {
+  padding: 0.6rem 0.6rem;
   transition: transform 0.5s ease;
 }
 .gameCard:hover .gameImage {
@@ -620,9 +650,17 @@
   flex-direction: column;
   justify-content: center;
   flex-grow: 1;
+  background-color: var(--white); /* Đảm bảo phần chữ là nền trắng */
+  border-radius: 0 12px 12px 0; /* Bo góc phải */
+}
+@media (max-width: 639px) {
+  /* Trên mobile */
+  .gameContent {
+    border-radius: 0 0 12px 12px;
+  }
 }
 .gameTitle {
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   font-weight: 700;
   color: var(--text-title);
   margin-bottom: 0.5rem;
@@ -658,5 +696,3 @@
   background-color: var(--text-light);
   transform: none;
 }
-
-/* === KẾT THÚC: CSS MỚI === */
