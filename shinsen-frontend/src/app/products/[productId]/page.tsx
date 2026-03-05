@@ -1,29 +1,28 @@
 import Link from "next/link";
 import { FiChevronLeft } from "react-icons/fi";
 import ProductDetailClient from "./ProductDetailClient";
-import styles from "./ProductDetailPage.module.css"; // Import file CSS mới
-import { createClient } from "@supabase/supabase-js";
+import styles from "./ProductDetailPage.module.css";
 import { notFound } from "next/navigation";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
+// Hàm lấy dữ liệu từ Backend Render thay vì gọi trực tiếp Supabase
 async function getProductById(productId: number) {
-  const { data, error } = await supabase
-    .from("products")
-    .select("*")
-    .eq("id", productId)
-    .single();
-  if (error) {
-    console.error("Supabase error fetching product:", error.message);
+  const API_URL =
+    process.env.NEXT_PUBLIC_API_URL ||
+    "https://shinsen-backend-api.onrender.com";
+
+  try {
+    // Gọi đến API sản phẩm mà Backend đã cung cấp
+    const res = await fetch(`${API_URL}/api/products/${productId}`, {
+      cache: "no-store",
+    });
+
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (error) {
+    console.error("Lỗi fetch sản phẩm từ Render:", error);
     return null;
   }
-  return data;
 }
-
-// (Hàm getRelatedProducts không thay đổi)
 
 type ProductDetailPageProps = {
   params: { productId: string };
@@ -32,7 +31,9 @@ type ProductDetailPageProps = {
 export default async function ProductDetailPage({
   params,
 }: ProductDetailPageProps) {
-  const productId = parseInt(params.productId.replace("product-", ""), 10);
+  // Xử lý ID từ format "product-1" hoặc "1"
+  const rawId = params.productId.replace("product-", "");
+  const productId = parseInt(rawId, 10);
 
   if (isNaN(productId)) {
     notFound();
@@ -43,8 +44,6 @@ export default async function ProductDetailPage({
   if (!product) {
     notFound();
   }
-
-  // const relatedProducts = await getRelatedProducts(product.category, product.id);
 
   return (
     <div className={styles.pageWrapper}>
@@ -57,7 +56,6 @@ export default async function ProductDetailPage({
 
           <ProductDetailClient product={product} />
         </div>
-        {/* Phần sản phẩm liên quan có thể thêm ở đây */}
       </main>
     </div>
   );
