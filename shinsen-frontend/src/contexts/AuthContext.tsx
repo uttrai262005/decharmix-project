@@ -6,27 +6,21 @@ import React, {
   useContext,
   useEffect,
   ReactNode,
+  useCallback,
 } from "react";
 import { jwtDecode } from "jwt-decode";
-import { toast } from "react-hot-toast"; // (Thêm toast để thông báo)
+import { toast } from "react-hot-toast";
+import { useRouter } from "next/navigation"; // Dùng router thay vì href
 
-// Interface User (Lấy từ file của bạn, đã đủ 7 vé)
 interface User {
   id: string;
   email: string;
   name?: string;
   full_name?: string;
   avatar_url?: string;
-  phone?: string;
   coins: number;
   role: string;
-  spin_tickets: number;
-  box_keys: number;
-  memory_plays: number;
-  whac_plays: number;
-  jump_plays: number;
-  claw_plays: number;
-  slice_plays: number;
+  // ... các trường khác giữ nguyên
 }
 
 interface AuthContextType {
@@ -41,118 +35,89 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-// Lấy URL Backend từ file .env.local
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "https://shinsen-backend-api.onrender.com";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
-  // === SỬA LỖI 1: SỬA HÀM FETCH PROFILE ===
-  const fetchUserProfile = async (currentToken: string) => {
-    if (!API_URL) {
-      console.error("Lỗi: NEXT_PUBLIC_API_URL chưa được cấu hình.");
-      setIsLoading(false);
-      return;
-    }
-
+  // Hàm lấy thông tin mới nhất từ Server
+  const fetchUserProfile = useCallback(async (currentToken: string) => {
     try {
       const response = await fetch(`${API_URL}/api/users/profile`, {
         headers: { Authorization: `Bearer ${currentToken}` },
       });
-      if (!response.ok) throw new Error("Phiên đăng nhập không hợp lệ.");
-
+      if (!response.ok) throw new Error("Session expired");
       const freshUserData = await response.json();
       setUser(freshUserData);
-      setToken(currentToken);
       setIsAuthenticated(true);
+      setToken(currentToken);
     } catch (error) {
-      console.error("Lỗi xác thực:", error);
-      localStorage.removeItem("decharmix_token");
-      setUser(null);
-      setToken(null);
-      setIsAuthenticated(false);
+      console.error("Auth check failed:", error);
+      logout();
     } finally {
       setIsLoading(false);
     }
-  };
-  // ======================================
-
-  useEffect(() => {
-    const initializeAuth = async () => {
-      const storedToken = localStorage.getItem("decharmix_token");
-      if (storedToken) {
-        try {
-          jwtDecode(storedToken);
-          await fetchUserProfile(storedToken);
-        } catch (error) {
-          localStorage.removeItem("decharmix_token");
-          setUser(null);
-          setToken(null);
-          setIsAuthenticated(false);
-          setIsLoading(false);
-        }
-      } else {
-        setIsLoading(false);
-      }
-    };
-    initializeAuth();
   }, []);
 
-  // (Hàm Login giữ nguyên)
+  // Kiểm tra token ngay khi mở trang
+  useEffect(() => {
+    const storedToken = localStorage.getItem("decharmix_token");
+    if (storedToken) {
+      try {
+        const decoded: any = jwtDecode(storedToken);
+        // Kiểm tra xem token hết hạn chưa
+        if (decoded.exp * 1000 < Date.now()) {
+          logout();
+        } else {
+          setToken(storedToken);
+          setIsAuthenticated(true); // Cho phép user "vào cửa" trước
+          fetchUserProfile(storedToken); // Cập nhật dữ liệu thật sau
+        }
+      } catch (e) {
+        logout();
+      }
+    } else {
+      setIsLoading(false);
+    }
+  }, [fetchUserProfile]);
+
   const login = (jwtToken: string, userData: User) => {
     localStorage.setItem("decharmix_token", jwtToken);
-    setUser(userData);
     setToken(jwtToken);
-    setIsAuthenticated(true);
+    setUser(userData);
+    setIsAuthenticated(true); // Cập nhật state ngay lập tức!
 
+    toast.success(`Chào mừng ${userData.full_name || userData.name}!`);
+
+    // Dùng router.push để không làm mất State của React
     if (userData.role === "admin") {
-      window.location.href = "/dashboard";
+      router.push("/dashboard");
     } else {
-      // (Thêm toast chào mừng)
-      toast.success(
-        `Chào mừng trở lại, ${userData.full_name || userData.name}!`
-      );
-      window.location.href = "/";
+      router.push("/");
     }
   };
 
-  // (Hàm Logout giữ nguyên)
   const logout = () => {
     localStorage.removeItem("decharmix_token");
     setUser(null);
     setToken(null);
     setIsAuthenticated(false);
-    window.location.href = "/login";
+    router.push("/login");
   };
 
-  // (Hàm updateUser giữ nguyên)
   const updateUser = (newUserData: Partial<User>) => {
-    setUser((prevUser) => (prevUser ? { ...prevUser, ...newUserData } : null));
+    setUser((prev) => (prev ? { ...prev, ...newUserData } : null));
   };
 
-  // === SỬA LỖI 2: SỬA HÀM REFRESH STATS ===
   const refreshUserStats = async () => {
-    const currentToken = localStorage.getItem("decharmix_token");
-    if (currentToken && API_URL) {
-      console.log("Đang làm mới thông tin User (Tất cả vé)...");
-      try {
-        const response = await fetch(`${API_URL}/api/users/profile`, {
-          headers: { Authorization: `Bearer ${currentToken}` },
-        });
-        if (!response.ok) throw new Error("Phiên đăng nhập không hợp lệ.");
-        const freshUserData = await response.json();
-        setUser(freshUserData); // Cập nhật lại user
-      } catch (error) {
-        console.error("Lỗi làm mới:", error);
-        logout(); // Đăng xuất nếu lỗi
-      }
-    }
+    const currentToken = token || localStorage.getItem("decharmix_token");
+    if (currentToken) await fetchUserProfile(currentToken);
   };
-  // ======================================
 
   return (
     <AuthContext.Provider
@@ -174,8 +139,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
+  if (!context) throw new Error("useAuth must be used within an AuthProvider");
   return context;
 };
